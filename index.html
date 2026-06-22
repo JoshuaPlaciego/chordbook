@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worship Chordbook</title>
+    <title>Worship Chordbook v0.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
@@ -28,16 +28,21 @@
                 <button onclick="toggleAdmin()" class="text-[9px] text-indigo-400 hover:text-indigo-300 uppercase">Admin</button>
             </div>
             <div id="sideContent" class="space-y-1">Loading...</div>
-        </div>
-        <div class="p-6 border-t border-gray-800 bg-[#14161d]">
-            <h2 class="text-indigo-400 font-bold text-[9px] uppercase tracking-widest mb-3">Capabilities v0.5</h2>
-            <ul class="text-[10px] text-gray-500 space-y-1.5 font-mono">
-                <li>• Live Library Sync</li><li>• Real-time Search</li><li>• Private Favorites</li><li>• Setlist Integration</li><li>• Admin CRUD (v0.5)</li>
-            </ul>
+            <button id="addBtn" onclick="openForm()" class="hidden w-full mt-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded">ADD NEW SONG</button>
         </div>
     </div>
     
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/50 z-[90] hidden"></div>
+    <div id="formModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm border border-gray-800">
+            <h3 id="formTitle" class="text-lg font-bold mb-4">Add Song</h3>
+            <input type="text" id="fTitle" placeholder="Title" class="w-full bg-gray-800 p-2 rounded mb-2 text-sm">
+            <input type="text" id="fArtist" placeholder="Artist" class="w-full bg-gray-800 p-2 rounded mb-2 text-sm">
+            <input type="text" id="fKey" placeholder="Key" class="w-full bg-gray-800 p-2 rounded mb-4 text-sm">
+            <button onclick="submitForm()" class="w-full bg-indigo-600 py-2 rounded font-bold">SAVE</button>
+            <button onclick="closeForm()" class="w-full mt-2 text-gray-500 text-xs">Cancel</button>
+        </div>
+    </div>
 
     <header class="sticky top-0 bg-[#0f1117]/90 backdrop-blur-md border-b border-gray-800 p-4 z-50 flex items-center gap-4">
         <button onclick="toggleNav(true)" class="p-2 hover:bg-gray-800 rounded-lg">
@@ -45,7 +50,7 @@
         </button>
         <div class="flex flex-col">
             <h1 id="pageTitle" class="text-lg font-bold truncate">Chordbook</h1>
-            <span class="text-[8px] text-gray-600 font-mono tracking-widest uppercase">v0.5</span>
+            <span class="text-[8px] text-gray-600 font-mono tracking-widest uppercase">v0.5 Complete</span>
         </div>
     </header>
 
@@ -69,7 +74,11 @@
             renderList(); 
         }
 
-        function toggleAdmin() { isAdmin = !isAdmin; renderList(); }
+        function toggleAdmin() { 
+            isAdmin = !isAdmin; 
+            document.getElementById('addBtn').classList.toggle('hidden', !isAdmin);
+            renderList(); 
+        }
 
         function renderList() {
             const container = document.getElementById('sideContent');
@@ -88,14 +97,12 @@
         }
 
         async function deleteSong(id) {
-            if(!confirm('Are you sure you want to delete this song?')) return;
+            if(!confirm('Are you sure?')) return;
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) });
             songs = songs.filter(s => s.SongID !== id);
             renderList();
         }
 
-        function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
-        
         function toggleFav(id) {
             id = String(id);
             if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
@@ -103,6 +110,27 @@
             localStorage.setItem('favs', JSON.stringify(favorites));
             changeSong(currentSong);
         }
+
+        function openForm(song) {
+            currentSong = song || null;
+            document.getElementById('formTitle').innerText = song ? 'Edit Song' : 'Add Song';
+            document.getElementById('fTitle').value = song ? song.Title : '';
+            document.getElementById('fArtist').value = song ? song.Artist : '';
+            document.getElementById('fKey').value = song ? song.OriginalKey : '';
+            document.getElementById('formModal').classList.remove('hidden');
+        }
+
+        function closeForm() { document.getElementById('formModal').classList.add('hidden'); }
+
+        async function submitForm() {
+            const action = currentSong ? 'edit' : 'add';
+            const values = [currentSong ? currentSong.SongID : Date.now(), document.getElementById('fTitle').value, document.getElementById('fArtist').value, document.getElementById('fKey').value];
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, tab: 'Songs', id: values[0], values, secret: SECRET }) });
+            closeForm();
+            initApp();
+        }
+
+        function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
         
         async function changeSong(song) {
             currentSong = song;
@@ -116,9 +144,8 @@
                     <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
                         ${song.Artist ? `<span class="bg-gray-800 px-3 py-1 rounded-full">${song.Artist}</span>` : ''}
                         ${song.OriginalKey ? `<span class="bg-gray-800 px-3 py-1 rounded-full">Key: ${song.OriginalKey}</span>` : ''}
-                        <button onclick="toggleFav(${song.SongID})" class="${isFav ? 'bg-indigo-600' : 'bg-gray-800'} px-3 py-1 rounded-full text-xs transition-colors">
-                            ${isFav ? '★ Favorited' : '☆ Favorite'}
-                        </button>
+                        <button onclick="toggleFav(${song.SongID})" class="${isFav ? 'bg-indigo-600' : 'bg-gray-800'} px-3 py-1 rounded-full text-xs transition-colors">Fav</button>
+                        ${isAdmin ? `<button onclick="openForm(currentSong)" class="bg-gray-800 px-3 py-1 rounded-full text-xs">Edit</button>` : ''}
                     </div>
                     ${songLines.map(l => `<div class="mb-4"><div class="chord-line">${l.Chords || ''}</div><div class="lyric-line">${l.Lyrics || ''}</div></div>`).join('')}
                 </div>
