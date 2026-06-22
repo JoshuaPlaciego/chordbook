@@ -30,6 +30,9 @@
             <div id="sideContent" class="space-y-1">Loading...</div>
             <button id="addBtn" onclick="openForm()" class="hidden w-full mt-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded">ADD NEW SONG</button>
         </div>
+        <div class="p-6 border-t border-gray-800 bg-[#14161d]">
+            <h2 class="text-indigo-400 font-bold text-[9px] uppercase tracking-widest mb-3">Capabilities v0.5</h2>
+        </div>
     </div>
     
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/50 z-[90] hidden"></div>
@@ -39,7 +42,7 @@
             <input type="text" id="fTitle" placeholder="Title" class="w-full bg-gray-800 p-2 rounded mb-2 text-sm">
             <input type="text" id="fArtist" placeholder="Artist" class="w-full bg-gray-800 p-2 rounded mb-2 text-sm">
             <input type="text" id="fKey" placeholder="Key" class="w-full bg-gray-800 p-2 rounded mb-4 text-sm">
-            <button onclick="submitForm()" class="w-full bg-indigo-600 py-2 rounded font-bold">SAVE</button>
+            <button onclick="submitForm()" id="submitBtn" class="w-full bg-indigo-600 py-2 rounded font-bold">SAVE</button>
             <button onclick="closeForm()" class="w-full mt-2 text-gray-500 text-xs">Cancel</button>
         </div>
     </div>
@@ -50,7 +53,6 @@
         </button>
         <div class="flex flex-col">
             <h1 id="pageTitle" class="text-lg font-bold truncate">Chordbook</h1>
-            <span class="text-[8px] text-gray-600 font-mono tracking-widest uppercase">v0.5 Complete</span>
         </div>
     </header>
 
@@ -98,7 +100,11 @@
 
         async function deleteSong(id) {
             if(!confirm('Are you sure?')) return;
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) });
+            await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) 
+            });
             songs = songs.filter(s => s.SongID !== id);
             renderList();
         }
@@ -123,29 +129,26 @@
         function closeForm() { document.getElementById('formModal').classList.add('hidden'); }
 
         async function submitForm() {
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = 'SAVING...';
-    const action = currentSong ? 'edit' : 'add';
-    const values = [currentSong ? currentSong.SongID : Date.now(), document.getElementById('fTitle').value, document.getElementById('fArtist').value, document.getElementById('fKey').value];
-    
-    try {
-        const response = await fetch(SCRIPT_URL, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, tab: 'Songs', id: values[0], values, secret: SECRET }) 
-        });
-        
-        const result = await response.json(); // Now we can read this!
-        console.log('Server response:', result);
-        btn.innerText = 'SAVE';
-        closeForm();
-        initApp(); // Refresh the list
-    } catch (err) {
-        console.error('Submission failed:', err);
-        btn.innerText = 'SAVE';
-        alert('Submission failed. Check Console (F12).');
-    }
-}
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = 'SAVING...';
+            const action = currentSong ? 'edit' : 'add';
+            const values = [currentSong ? currentSong.SongID : Date.now(), document.getElementById('fTitle').value, document.getElementById('fArtist').value, document.getElementById('fKey').value];
+            try {
+                const response = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, tab: 'Songs', id: values[0], values, secret: SECRET }) 
+                });
+                const result = await response.json();
+                btn.innerText = 'SAVE';
+                closeForm();
+                initApp();
+            } catch (err) {
+                console.error(err);
+                btn.innerText = 'SAVE';
+                alert('Submission failed. Check Console.');
+            }
+        }
 
         function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
         
