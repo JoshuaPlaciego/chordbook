@@ -105,6 +105,7 @@
                     <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
                     <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
                         ${song.Artist ? `<span class="bg-gray-800 px-3 py-1 rounded-full">${song.Artist}</span>` : ''}
+                        ${song.OriginalKey ? `<span class="bg-gray-800 px-3 py-1 rounded-full text-indigo-300">Key: ${song.OriginalKey}</span>` : ''}
                         <button onclick="toggleFav(${song.SongID})" class="bg-gray-800 px-3 py-1 rounded-full text-xs transition-colors">Fav</button>
                     </div>
                     ${songLines.map(l => `<div class="mb-4"><div class="chord-line">${l.Chords || ''}</div><div class="lyric-line">${l.Lyrics || ''}</div></div>`).join('')}
