@@ -15,19 +15,22 @@
 
     <div id="navDrawer" class="fixed inset-y-0 left-0 w-72 bg-[#171921] border-r border-gray-800 z-[100] transform -translate-x-full shadow-2xl">
         <div class="p-6">
-            <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-6">Library</h2>
+            <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-6">Navigation</h2>
             
-            <div class="flex gap-2 mb-4">
-                <button onclick="setTab('songs')" class="flex-1 text-xs py-2 bg-gray-800 rounded">Songs</button>
-                <button onclick="setTab('favorites')" class="flex-1 text-xs py-2 hover:bg-gray-800 rounded">Favs</button>
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <button onclick="setTab('songs')" id="tab-songs" class="text-[10px] font-bold py-2 bg-gray-800 rounded">SONGS</button>
+                <button onclick="setTab('setlists')" id="tab-setlists" class="text-[10px] font-bold py-2 hover:bg-gray-800 rounded">SETS</button>
+                <button onclick="setTab('favorites')" id="tab-favorites" class="text-[10px] font-bold py-2 hover:bg-gray-800 rounded">FAVS</button>
             </div>
 
-            <input type="text" id="searchInput" oninput="renderList()" placeholder="Search..." 
+            <input type="text" id="searchInput" oninput="renderList()" placeholder="Search library..." 
                    class="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg text-sm mb-6 outline-none focus:border-indigo-500">
             
-            <div id="sideContent" class="space-y-1 overflow-y-auto h-[calc(100vh-200px)]">Loading...</div>
+            <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-2" id="listHeader">All Songs</div>
+            <div id="sideContent" class="space-y-1 overflow-y-auto h-[calc(100vh-250px)]">Loading...</div>
         </div>
     </div>
+    
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/50 z-[90] hidden"></div>
 
     <header class="sticky top-0 bg-[#0f1117]/90 backdrop-blur-md border-b border-gray-800 p-4 z-50 flex items-center gap-4">
@@ -38,46 +41,54 @@
     </header>
 
     <main id="appView" class="max-w-xl mx-auto p-5 pb-32">
-        <div class="text-center mt-20 text-gray-500">Select a song to begin.</div>
+        <div class="text-center mt-20 text-gray-500">Select a song or setlist to begin.</div>
     </main>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywWSLvZgnf1eBR5Uf0vWV24bmDTLr7p3LD0RdzI9qAozL4n2yqUWxHhAWzlaMOFfhU/exec';
-        let songs = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
+        let songs = [], setlists = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
         let currentTab = 'songs';
 
         async function fetchTab(tabName) {
-            const response = await fetch(`${SCRIPT_URL}?tab=${tabName}`);
-            return await response.json();
+            try {
+                const response = await fetch(`${SCRIPT_URL}?tab=${tabName}`);
+                return await response.json();
+            } catch (e) { return []; }
         }
 
         async function initApp() {
-            try {
-                songs = await fetchTab('Songs');
-                renderList();
-            } catch (err) { document.getElementById('sideContent').innerHTML = "Error loading."; }
+            [songs, setlists] = await Promise.all([fetchTab('Songs'), fetchTab('Setlists')]);
+            renderList();
         }
 
         function setTab(tab) {
             currentTab = tab;
+            document.querySelectorAll('.grid button').forEach(b => b.classList.replace('bg-gray-800', 'hover:bg-gray-800'));
+            document.getElementById(`tab-${tab}`).classList.replace('hover:bg-gray-800', 'bg-gray-800');
             renderList();
         }
 
         function renderList() {
             const container = document.getElementById('sideContent');
+            const header = document.getElementById('listHeader');
             const query = document.getElementById('searchInput').value.toLowerCase();
             container.innerHTML = '';
             
-            let filtered = songs;
-            // Force string comparison for reliable matching
-            if (currentTab === 'favorites') {
-                filtered = songs.filter(s => favorites.some(f => String(f) === String(s.SongID)));
+            let filtered = [];
+            if (currentTab === 'songs') {
+                header.innerText = "All Songs";
+                filtered = songs.filter(s => s.Title.toLowerCase().includes(query));
+            } else if (currentTab === 'setlists') {
+                header.innerText = "Active Setlists";
+                filtered = setlists.filter(s => s.Title.toLowerCase().includes(query));
+            } else {
+                header.innerText = "Your Favorites";
+                filtered = songs.filter(s => favorites.includes(String(s.SongID)) && s.Title.toLowerCase().includes(query));
             }
-            filtered = filtered.filter(s => s.Title.toLowerCase().includes(query));
 
             filtered.forEach(s => {
                 const btn = document.createElement('button');
-                btn.className = "block w-full text-left p-3 hover:bg-gray-800 rounded-lg text-sm text-gray-300";
+                btn.className = "block w-full text-left p-3 hover:bg-gray-800 rounded-lg text-sm text-gray-300 transition-colors";
                 btn.innerText = s.Title;
                 btn.onclick = () => changeSong(s);
                 container.appendChild(btn);
@@ -96,10 +107,10 @@
             const allLines = await fetchTab('SongLines');
             const songLines = allLines.filter(line => line.SongID == song.SongID);
             const currentIndex = songs.findIndex(s => s.SongID === song.SongID);
-            const isFaved = favorites.some(f => String(f) === String(song.SongID));
+            const isFaved = favorites.includes(String(song.SongID));
             
             document.getElementById('appView').innerHTML = `
-                <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
+                <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 shadow-xl">
                     <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
                     <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
                         ${song.Artist ? `<span class="bg-gray-800 px-3 py-1 rounded-full">${song.Artist}</span>` : ''}
@@ -108,16 +119,16 @@
                             ${isFaved ? '❤️ Faved' : '🤍 Fav'}
                         </button>
                     </div>
-                    ${songLines.map(l => `
+                    ${songLines.length > 0 ? songLines.map(l => `
                         <div class="mb-4">
                             <div class="chord-line text-lg">${l.Chords || ''}</div>
                             <div class="lyric-line">${l.Lyrics || ''}</div>
                         </div>
-                    `).join('')}
+                    `).join('') : '<div class="text-gray-500 py-10">No lyrics or chords available.</div>'}
                     
                     <div class="flex justify-between mt-10 pt-6 border-t border-gray-800">
-                        <button onclick="changeSong(songs[${currentIndex - 1}])" ${currentIndex <= 0 ? 'disabled' : ''} class="text-gray-500 disabled:opacity-30">Previous</button>
-                        <button onclick="changeSong(songs[${currentIndex + 1}])" ${currentIndex >= songs.length - 1 ? 'disabled' : ''} class="text-gray-500 disabled:opacity-30">Next</button>
+                        <button onclick="changeSong(songs[${currentIndex - 1}])" ${currentIndex <= 0 ? 'disabled' : ''} class="text-gray-500 disabled:opacity-30 font-medium">Previous</button>
+                        <button onclick="changeSong(songs[${currentIndex + 1}])" ${currentIndex >= songs.length - 1 ? 'disabled' : ''} class="text-gray-500 disabled:opacity-30 font-medium">Next</button>
                     </div>
                 </div>
             `;
@@ -127,18 +138,19 @@
 
         function toggleFav(id) {
             const strId = String(id);
-            if (favorites.some(f => String(f) === strId)) favorites = favorites.filter(f => String(f) !== strId);
+            if (favorites.includes(strId)) favorites = favorites.filter(f => f !== strId);
             else favorites.push(strId);
             
             localStorage.setItem('favs', JSON.stringify(favorites));
-
-            // Update UI
+            
             const btn = document.getElementById('favBtn');
             if (btn) {
-                const isFaved = favorites.some(f => String(f) === strId);
+                const isFaved = favorites.includes(strId);
                 btn.className = (isFaved ? "bg-red-900/50 text-red-200" : "bg-gray-800") + " px-3 py-1 rounded-full text-xs transition-colors";
                 btn.innerText = isFaved ? "❤️ Faved" : "🤍 Fav";
             }
+            // Ensure the list updates immediately if we are on the Fav tab
+            if (currentTab === 'favorites') renderList();
         }
 
         window.onload = initApp;
