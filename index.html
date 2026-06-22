@@ -6,8 +6,8 @@
     <title>Worship Chordbook</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
-        .lyric-line { color: #f1f5f9; font-size: 1.15rem; }
+        .chord-line { color: #fbbf24; font-weight: 700; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.05em; }
+        .lyric-line { color: #f1f5f9; font-size: 1.1rem; line-height: 1.6; }
         #navDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
@@ -16,11 +16,14 @@
     <div id="navDrawer" class="fixed inset-y-0 left-0 w-72 bg-[#171921] border-r border-gray-800 z-[100] transform -translate-x-full shadow-2xl">
         <div class="p-6">
             <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-6">Library</h2>
-            <nav class="space-y-1 mb-8">
-                <button onclick="navigateTo('Dashboard')" class="w-full text-left p-3 hover:bg-gray-800 rounded-lg font-medium">Dashboard</button>
-            </nav>
-            <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-4">Songs</h2>
-            <div id="setlistItems" class="space-y-1">Loading library...</div>
+            
+            <!-- Search Bar -->
+            <input type="text" id="searchInput" oninput="filterSongs()" placeholder="Search songs..." 
+                   class="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg text-sm mb-6 outline-none focus:border-indigo-500">
+
+            <div id="setlistItems" class="space-y-1 overflow-y-auto h-[calc(100vh-200px)]">
+                <div class="text-gray-500 p-3 text-sm">Loading library...</div>
+            </div>
         </div>
     </div>
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/50 z-[90] hidden"></div>
@@ -29,15 +32,14 @@
         <button onclick="toggleNav(true)" class="p-2 hover:bg-gray-800 rounded-lg">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
-        <h1 id="pageTitle" class="text-lg font-bold">Chordbook</h1>
+        <h1 id="pageTitle" class="text-lg font-bold truncate">Chordbook</h1>
     </header>
 
     <main id="appView" class="max-w-xl mx-auto p-5 pb-32">
-        <div class="text-center mt-20 text-gray-500">Initializing database connection...</div>
+        <div class="text-center mt-20 text-gray-500">Select a song from the library to begin.</div>
     </main>
 
     <script>
-        // PASTE YOUR GOOGLE APPS SCRIPT URL BELOW:
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywWSLvZgnf1eBR5Uf0vWV24bmDTLr7p3LD0RdzI9qAozL4n2yqUWxHhAWzlaMOFfhU/exec';
         let songs = [];
 
@@ -49,10 +51,28 @@
         async function initApp() {
             try {
                 songs = await fetchTab('Songs');
-                initNav();
+                renderList(songs);
             } catch (err) {
-                document.getElementById('appView').innerHTML = "Error loading songs.";
+                document.getElementById('setlistItems').innerHTML = "<div class='text-red-400 p-3'>Error loading library.</div>";
             }
+        }
+
+        function filterSongs() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = songs.filter(s => s.Title.toLowerCase().includes(query));
+            renderList(filtered);
+        }
+
+        function renderList(list) {
+            const container = document.getElementById('setlistItems');
+            container.innerHTML = '';
+            list.forEach((s, i) => {
+                const btn = document.createElement('button');
+                btn.className = "block w-full text-left p-3 hover:bg-gray-800 rounded-lg text-sm text-gray-300 transition-colors";
+                btn.innerText = s.Title;
+                btn.onclick = () => changeSong(s);
+                container.appendChild(btn);
+            });
         }
 
         function toggleNav(show) {
@@ -60,18 +80,20 @@
             document.getElementById('overlay').classList.toggle('hidden', !show);
         }
 
-        async function changeSong(index) {
-            const song = songs[index];
+        async function changeSong(song) {
             document.getElementById('pageTitle').innerText = song.Title;
-            
-            document.getElementById('appView').innerHTML = `<div class="text-gray-500">Loading ${song.Title}...</div>`;
+            document.getElementById('appView').innerHTML = `<div class="text-gray-500 text-center mt-10">Loading ${song.Title}...</div>`;
             
             const allLines = await fetchTab('SongLines');
             const songLines = allLines.filter(line => line.SongID == song.SongID);
             
             document.getElementById('appView').innerHTML = `
-                <div class="p-6 bg-gray-900 rounded-2xl">
-                    <h2 class="text-2xl font-bold mb-4">${song.Title}</h2>
+                <div class="bg-gray-900 rounded-2xl p-6 shadow-xl border border-gray-800">
+                    <h2 class="text-3xl font-bold text-white mb-2">${song.Title}</h2>
+                    <div class="text-sm text-indigo-300 mb-6 border-b border-gray-700 pb-4 flex flex-wrap gap-4">
+                        ${song.Artist ? `<span class="bg-gray-800 px-2 py-1 rounded">${song.Artist}</span>` : ''}
+                        ${song.Key ? `<span class="bg-gray-800 px-2 py-1 rounded">Key: ${song.Key}</span>` : ''}
+                    </div>
                     ${songLines.map(l => `
                         <div class="mb-4">
                             <div class="chord-line text-lg">${l.Chords || ''}</div>
@@ -81,18 +103,7 @@
                 </div>
             `;
             toggleNav(false);
-        }
-
-        function initNav() {
-            const list = document.getElementById('setlistItems');
-            list.innerHTML = '';
-            songs.forEach((s, i) => {
-                const btn = document.createElement('button');
-                btn.className = "block w-full text-left p-3 hover:bg-gray-800 rounded-lg text-sm text-gray-300";
-                btn.innerText = s.Title;
-                btn.onclick = () => changeSong(i);
-                list.appendChild(btn);
-            });
+            window.scrollTo(0, 0);
         }
 
         window.onload = initApp;
