@@ -20,10 +20,9 @@
             <div class="flex gap-2 mb-4">
                 <button onclick="setTab('songs')" class="flex-1 text-xs py-2 bg-gray-800 rounded">Songs</button>
                 <button onclick="setTab('favorites')" class="flex-1 text-xs py-2 hover:bg-gray-800 rounded">Favs</button>
-                <button onclick="setTab('setlists')" class="flex-1 text-xs py-2 hover:bg-gray-800 rounded">Lists</button>
             </div>
 
-            <input type="text" id="searchInput" oninput="filterList()" placeholder="Search..." 
+            <input type="text" id="searchInput" oninput="renderList()" placeholder="Search..." 
                    class="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg text-sm mb-6 outline-none focus:border-indigo-500">
             
             <div id="sideContent" class="space-y-1 overflow-y-auto h-[calc(100vh-200px)]">Loading...</div>
@@ -70,7 +69,10 @@
             container.innerHTML = '';
             
             let filtered = songs;
-            if (currentTab === 'favorites') filtered = songs.filter(s => favorites.includes(s.SongID));
+            // Force string comparison for reliable matching
+            if (currentTab === 'favorites') {
+                filtered = songs.filter(s => favorites.some(f => String(f) === String(s.SongID)));
+            }
             filtered = filtered.filter(s => s.Title.toLowerCase().includes(query));
 
             filtered.forEach(s => {
@@ -93,8 +95,8 @@
             
             const allLines = await fetchTab('SongLines');
             const songLines = allLines.filter(line => line.SongID == song.SongID);
-            
             const currentIndex = songs.findIndex(s => s.SongID === song.SongID);
+            const isFaved = favorites.some(f => String(f) === String(song.SongID));
             
             document.getElementById('appView').innerHTML = `
                 <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
@@ -102,7 +104,9 @@
                     <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
                         ${song.Artist ? `<span class="bg-gray-800 px-3 py-1 rounded-full">${song.Artist}</span>` : ''}
                         ${song.OriginalKey ? `<span class="bg-gray-800 px-3 py-1 rounded-full">Key: ${song.OriginalKey}</span>` : ''}
-                        <button onclick="toggleFav(${song.SongID})" class="bg-gray-800 px-3 py-1 rounded-full text-xs">❤️ Fav</button>
+                        <button id="favBtn" onclick="toggleFav(${song.SongID})" class="${isFaved ? 'bg-red-900/50 text-red-200' : 'bg-gray-800'} px-3 py-1 rounded-full text-xs transition-colors">
+                            ${isFaved ? '❤️ Faved' : '🤍 Fav'}
+                        </button>
                     </div>
                     ${songLines.map(l => `
                         <div class="mb-4">
@@ -122,9 +126,19 @@
         }
 
         function toggleFav(id) {
-            if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-            else favorites.push(id);
+            const strId = String(id);
+            if (favorites.some(f => String(f) === strId)) favorites = favorites.filter(f => String(f) !== strId);
+            else favorites.push(strId);
+            
             localStorage.setItem('favs', JSON.stringify(favorites));
+
+            // Update UI
+            const btn = document.getElementById('favBtn');
+            if (btn) {
+                const isFaved = favorites.some(f => String(f) === strId);
+                btn.className = (isFaved ? "bg-red-900/50 text-red-200" : "bg-gray-800") + " px-3 py-1 rounded-full text-xs transition-colors";
+                btn.innerText = isFaved ? "❤️ Faved" : "🤍 Fav";
+            }
         }
 
         window.onload = initApp;
