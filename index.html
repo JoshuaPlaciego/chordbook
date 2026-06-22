@@ -69,82 +69,38 @@
         async function fetchTab(tabName) { try { const response = await fetch(`${SCRIPT_URL}?tab=${tabName}`); return await response.json(); } catch (e) { return []; } }
         async function initApp() { [songs, setlists] = await Promise.all([fetchTab('Songs'), fetchTab('Setlists')]); renderList(); }
         
-        function setTab(tab) { 
-            currentTab = tab; 
-            document.querySelectorAll('.grid button').forEach(b => b.classList.replace('bg-gray-800', 'hover:bg-gray-800')); 
-            document.getElementById(`tab-${tab}`).classList.replace('hover:bg-gray-800', 'bg-gray-800'); 
-            renderList(); 
-        }
-
-        function toggleAdmin() { 
-            isAdmin = !isAdmin; 
-            document.getElementById('addBtn').classList.toggle('hidden', !isAdmin);
-            renderList(); 
-        }
-
-        function renderList() {
-            const container = document.getElementById('sideContent');
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            container.innerHTML = '';
-            let filtered = currentTab === 'songs' ? songs : currentTab === 'favorites' ? songs.filter(s => favorites.includes(String(s.SongID))) : setlists;
-            filtered.filter(s => s.Title.toLowerCase().includes(query)).forEach(s => {
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between hover:bg-gray-800 rounded-lg";
-                div.innerHTML = `
-                    <button class="flex-1 text-left p-3 text-sm text-gray-300" onclick="changeSong(${JSON.stringify(s).replace(/"/g, '&quot;')})">${s.Title}</button>
-                    ${isAdmin ? `<button onclick="deleteSong(${s.SongID})" class="px-3 text-red-500 text-xs font-bold">X</button>` : ''}
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        async function deleteSong(id) {
-            if(!confirm('Are you sure?')) return;
-            await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) 
-            });
-            songs = songs.filter(s => s.SongID !== id);
-            renderList();
-        }
-
-        function toggleFav(id) {
-            id = String(id);
-            if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-            else favorites.push(id);
-            localStorage.setItem('favs', JSON.stringify(favorites));
-            changeSong(currentSong);
-        }
-
-        function openForm(song) {
-            currentSong = song || null;
-            document.getElementById('formTitle').innerText = song ? 'Edit Song' : 'Add Song';
-            document.getElementById('fTitle').value = song ? song.Title : '';
-            document.getElementById('fArtist').value = song ? song.Artist : '';
-            document.getElementById('fKey').value = song ? song.OriginalKey : '';
-            document.getElementById('formModal').classList.remove('hidden');
-        }
-
-        function closeForm() { document.getElementById('formModal').classList.add('hidden'); }
-
         async function submitForm() {
             const btn = document.getElementById('submitBtn');
             btn.innerText = 'SAVING...';
+            
             const action = currentSong ? 'edit' : 'add';
-            const values = [currentSong ? currentSong.SongID : Date.now(), document.getElementById('fTitle').value, document.getElementById('fArtist').value, document.getElementById('fKey').value];
+            const values = [
+                currentSong ? currentSong.SongID : Date.now(), 
+                document.getElementById('fTitle').value, 
+                document.getElementById('fArtist').value, 
+                document.getElementById('fKey').value
+            ];
+
+            // Use URLSearchParams instead of JSON.stringify for the body
+            const formData = new URLSearchParams();
+            formData.append('action', action);
+            formData.append('tab', 'Songs');
+            formData.append('id', values[0]);
+            formData.append('secret', SECRET);
+            formData.append('values', JSON.stringify(values));
+
             try {
                 const response = await fetch(SCRIPT_URL, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, tab: 'Songs', id: values[0], values, secret: SECRET }) 
+                    body: formData // No Content-Type header needed; browser sets it automatically
                 });
+                
                 const result = await response.json();
                 btn.innerText = 'SAVE';
                 closeForm();
                 initApp();
             } catch (err) {
-                console.error(err);
+                console.error('Submission failed:', err);
                 btn.innerText = 'SAVE';
                 alert('Submission failed. Check Console.');
             }
