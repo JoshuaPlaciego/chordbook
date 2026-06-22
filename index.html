@@ -57,7 +57,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywWSLvZgnf1eBR5Uf0vWV24bmDTLr7p3LD0RdzI9qAozL4n2yqUWxHhAWzlaMOFfhU/exec';
         const SECRET = 'YOUR_SECRET_KEY';
         let songs = [], setlists = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-        let currentTab = 'songs', isAdmin = false;
+        let currentTab = 'songs', isAdmin = false, currentSong = null;
 
         async function fetchTab(tabName) { try { const response = await fetch(`${SCRIPT_URL}?tab=${tabName}`); return await response.json(); } catch (e) { return []; } }
         async function initApp() { [songs, setlists] = await Promise.all([fetchTab('Songs'), fetchTab('Setlists')]); renderList(); }
@@ -96,17 +96,29 @@
 
         function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
         
+        function toggleFav(id) {
+            id = String(id);
+            if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
+            localStorage.setItem('favs', JSON.stringify(favorites));
+            changeSong(currentSong);
+        }
+        
         async function changeSong(song) {
+            currentSong = song;
             document.getElementById('pageTitle').innerText = song.Title;
             const allLines = await fetchTab('SongLines');
             const songLines = allLines.filter(line => line.SongID == song.SongID);
+            const isFav = favorites.includes(String(song.SongID));
             document.getElementById('appView').innerHTML = `
                 <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
                     <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
                     <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
                         ${song.Artist ? `<span class="bg-gray-800 px-3 py-1 rounded-full">${song.Artist}</span>` : ''}
-                        ${song.OriginalKey ? `<span class="bg-gray-800 px-3 py-1 rounded-full text-indigo-300">Key: ${song.OriginalKey}</span>` : ''}
-                        <button onclick="toggleFav(${song.SongID})" class="bg-gray-800 px-3 py-1 rounded-full text-xs transition-colors">Fav</button>
+                        ${song.OriginalKey ? `<span class="bg-gray-800 px-3 py-1 rounded-full">Key: ${song.OriginalKey}</span>` : ''}
+                        <button onclick="toggleFav(${song.SongID})" class="${isFav ? 'bg-indigo-600' : 'bg-gray-800'} px-3 py-1 rounded-full text-xs transition-colors">
+                            ${isFav ? '★ Favorited' : '☆ Favorite'}
+                        </button>
                     </div>
                     ${songLines.map(l => `<div class="mb-4"><div class="chord-line">${l.Chords || ''}</div><div class="lyric-line">${l.Lyrics || ''}</div></div>`).join('')}
                 </div>
