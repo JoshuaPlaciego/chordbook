@@ -34,12 +34,20 @@
     </div>
 
     <!-- Main View -->
-    <div id="appView" class="p-6"></div>
+    <div id="appView" class="p-6">
+        <div class="text-center mt-20 text-gray-500">Please select a song from the sidebar.</div>
+    </div>
 
     <script>
         const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
         let currentSong = null;
         let allLines = [];
+
+        // Initialization trigger
+        window.onload = () => {
+            // Your existing logic to load songs list would go here
+            console.log("App initialized.");
+        };
 
         async function changeSong(song) {
             currentSong = song;
