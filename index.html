@@ -45,42 +45,47 @@
 
         // Initialization trigger
         window.onload = () => {
-            // Your existing logic to load songs list would go here
             console.log("App initialized.");
+            // Add your logic here to load and render your song list sidebar
         };
 
         async function changeSong(song) {
             currentSong = song;
-            const linesData = await fetch(SCRIPT_URL + '?tab=SongLines').then(r => r.json());
-            allLines = linesData;
+            try {
+                const response = await fetch(SCRIPT_URL + '?tab=SongLines');
+                allLines = await response.json();
 
-            const songLines = allLines.filter(l => l.SongID == song.SongID).sort((a,b) => a.LineOrder - b.LineOrder);
-            const sections = {};
-            songLines.forEach(l => {
-                if(!sections[l.SectionName]) sections[l.SectionName] = [];
-                sections[l.SectionName].push(l);
-            });
+                const songLines = allLines.filter(l => l.SongID == song.SongID).sort((a,b) => a.LineOrder - b.LineOrder);
+                const sections = {};
+                songLines.forEach(l => {
+                    if(!sections[l.SectionName]) sections[l.SectionName] = [];
+                    sections[l.SectionName].push(l);
+                });
 
-            document.getElementById('appView').innerHTML = `
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold">${song.Title}</h2>
-                    <button onclick="document.getElementById('lineModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-sm font-bold rounded">+ Add Line</button>
-                </div>
-                ${Object.keys(sections).map(sec => `
-                    <div class="mb-6">
-                        <h4 class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest border-b border-gray-800 pb-1 mb-2">${sec}</h4>
-                        ${sections[sec].map(l => `
-                            <div class="mb-1 ${l.Type === 'Instruction' ? 'italic text-gray-500' : ''}">
-                                <div class="chord-line text-amber-500 font-mono text-sm">${l.Chords || '&nbsp;'}</div>
-                                <div class="lyric-line text-gray-200 text-base">${l.Lyrics || ''}</div>
-                            </div>
-                        `).join('')}
+                document.getElementById('appView').innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">${song.Title}</h2>
+                        <button onclick="document.getElementById('lineModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-sm font-bold rounded">+ Add Line</button>
                     </div>
-                `).join('')}
-            `;
+                    ${Object.keys(sections).map(sec => `
+                        <div class="mb-6">
+                            <h4 class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest border-b border-gray-800 pb-1 mb-2">${sec}</h4>
+                            ${sections[sec].map(l => `
+                                <div class="mb-1 ${l.Type === 'Instruction' ? 'italic text-gray-500' : ''}">
+                                    <div class="chord-line text-amber-500 font-mono text-sm">${l.Chords || '&nbsp;'}</div>
+                                    <div class="lyric-line text-gray-200 text-base">${l.Lyrics || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                `;
+            } catch (err) {
+                console.error("Error loading song:", err);
+            }
         }
 
         async function saveLine() {
+            if (!currentSong) return;
             const secName = document.getElementById('secName').value;
             const sectionLines = allLines.filter(l => l.SongID == currentSong.SongID && l.SectionName == secName);
             const nextOrder = sectionLines.length > 0 ? Math.max(...sectionLines.map(l => Number(l.LineOrder))) + 1 : 1;
