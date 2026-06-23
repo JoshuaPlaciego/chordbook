@@ -94,8 +94,8 @@
                                 <div class="p-4 pt-0">
                                     ${lines.map(l => `
                                         <div class="mb-2">
-                                            <div class="chord-line">${l.Type || ''}</div>
-                                            <div class="lyric-line">${l.Lyrics || ''}</div>
+                                            <div class="chord-line">${l.Chords || l.Type || ''}</div>
+                                            <div class="lyric-line">${l.Lyrics || Object.values(l)[4] || ''}</div>
                                         </div>
                                     `).join('')}
                                 </div>
