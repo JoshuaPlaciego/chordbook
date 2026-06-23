@@ -9,6 +9,7 @@
         .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
         .lyric-line { color: #f1f5f9; font-size: 1.15rem; }
         #navDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-transition { transition: opacity 0.25s ease, transform 0.25s ease; }
     </style>
 </head>
 <body class="bg-[#0f1117] text-gray-100 min-h-screen selection:bg-indigo-500/30 selection:text-white">
@@ -16,16 +17,41 @@
     <div id="navDrawer" class="fixed inset-y-0 left-0 w-72 bg-[#171921] border-r border-gray-800 z-[100] transform -translate-x-full shadow-2xl flex flex-col">
         <div class="p-6 flex-1 overflow-y-auto">
             <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-6">Library Menu</h2>
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <button onclick="setTab('songs')" id="tab-songs" class="text-[9px] font-bold py-2 bg-gray-800 rounded transition-colors duration-150">SONGS</button>
+                <button onclick="setTab('setlists')" id="tab-setlists" class="text-[9px] font-bold py-2 hover:bg-gray-800 rounded transition-colors duration-150">SETS</button>
+                <button onclick="setTab('favorites')" id="tab-favorites" class="text-[9px] font-bold py-2 hover:bg-gray-800 rounded transition-colors duration-150">FAVS</button>
+            </div>
             <input type="text" id="searchInput" oninput="renderList()" placeholder="Search library..." class="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg text-sm mb-6 outline-none focus:border-indigo-500 transition-colors">
+            <div class="flex items-center justify-between mb-2">
+                <div class="text-[9px] text-gray-500 uppercase tracking-widest" id="listHeader">All Songs</div>
+                <button onclick="toggleAdmin()" class="text-[9px] text-indigo-400 hover:text-indigo-300 uppercase font-bold tracking-wider transition-colors">Admin</button>
+            </div>
             <div id="sideContent" class="space-y-1">Loading...</div>
+            <button id="addBtn" onclick="openForm()" class="hidden w-full mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded shadow-lg shadow-indigo-600/20 transition-all">ADD NEW SONG</button>
         </div>
     </div>
     
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/60 z-[90] hidden transition-opacity duration-300"></div>
     
+    <div id="formModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4 modal-transition opacity-0">
+        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm border border-gray-800 shadow-2xl transform scale-95 transition-transform duration-300" id="formModalContainer">
+            <h3 id="formTitle" class="text-lg font-bold mb-4 text-white">Add Song</h3>
+            <div class="space-y-3 mb-6">
+                <input type="text" id="fTitle" placeholder="Song Title" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700">
+                <input type="text" id="fArtist" placeholder="Artist" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700">
+                <input type="text" id="fKey" placeholder="Original Key" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700">
+            </div>
+            <button id="submitBtn" onclick="submitForm()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors">SAVE</button>
+            <button onclick="closeForm()" class="w-full mt-3 text-gray-400 text-xs hover:text-gray-200 transition-colors py-1">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-[220] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
     <header class="sticky top-0 bg-[#0f1117]/95 backdrop-blur-md border-b border-gray-800 p-4 z-50 flex items-center gap-4">
-        <button onclick="toggleNav(true)" class="p-2.5 hover:bg-gray-800/80 rounded-lg text-indigo-400 border border-gray-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-        <div class="flex flex-col min-w-0"><h1 id="pageTitle" class="text-base font-bold truncate">Chordbook</h1></div>
+        <button onclick="toggleNav(true)" class="p-2.5 hover:bg-gray-800/80 rounded-lg text-indigo-400 flex items-center gap-2 font-bold text-xs tracking-wider border border-gray-800">MENU</button>
+        <div class="flex flex-col"><h1 id="pageTitle" class="text-base font-bold text-gray-100">Chordbook</h1></div>
     </header>
 
     <main id="appView" class="max-w-xl mx-auto p-5 pb-32">
@@ -35,76 +61,92 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXCeXackc_suAUMKCGJ6qIjMygAADB9zHmoJ5EqWU_OTmBxkgH9uHLP4nY427farS5/exec';
         let songs = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-        let currentSong = null;
-        
-        async function fetchTab(tabName) { try { const res = await fetch(`${SCRIPT_URL}?tab=${tabName}`); return await res.json(); } catch(e) { return []; } }
-        
-        async function initApp() { 
-            songs = await fetchTab('Songs');
-            renderList();
+        let currentTab = 'songs', isAdmin = false, currentSong = null;
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl text-xs shadow-2xl flex items-center gap-3 border ${type === 'success' ? 'bg-green-950 text-green-400' : 'bg-indigo-950 text-indigo-400'}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function initApp() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?tab=Songs`);
+                songs = await res.json();
+                renderList();
+                document.getElementById('appView').innerHTML = `<div class="text-center mt-20 text-gray-500">Select a song from the Menu.</div>`;
+            } catch(e) { showToast('Load error', 'error'); }
         }
 
         function renderList() {
             const container = document.getElementById('sideContent');
-            container.innerHTML = songs.map(s => `<button class="block w-full text-left p-3 text-sm text-gray-300 hover:bg-gray-800 rounded-lg truncate" onclick='changeSong(${JSON.stringify(s)})'>${s.Title}</button>`).join('');
+            container.innerHTML = '';
+            songs.forEach(s => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between hover:bg-gray-800 rounded-lg cursor-pointer p-3";
+                div.onclick = () => changeSong(s);
+                div.innerHTML = `<span class="text-sm text-gray-300">${s.Title}</span>`;
+                container.appendChild(div);
+            });
         }
 
         function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
-
-        function toggleFav(id) {
-            id = String(id);
-            if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-            else favorites.push(id);
-            localStorage.setItem('favs', JSON.stringify(favorites));
-            changeSong(currentSong);
-        }
 
         async function changeSong(song) {
             currentSong = song;
             document.getElementById('pageTitle').innerText = song.Title;
             toggleNav(false);
-            const allLines = await fetchTab('SongLines');
-            const songLines = allLines
-                .filter(line => line.SongID == song.SongID)
-                .sort((a, b) => (parseInt(a.LineOrder) || 0) - (parseInt(b.LineOrder) || 0));
-                
-            const grouped = songLines.reduce((acc, line) => {
-                const section = line.SectionName || "Lyrics";
-                if (!acc[section]) acc[section] = [];
-                acc[section].push(line);
-                return acc;
-            }, {});
             
-            const isFav = favorites.includes(String(song.SongID));
+            const appView = document.getElementById('appView');
+            appView.innerHTML = `<div class="text-center mt-20 text-gray-500">Loading song content...</div>`;
 
-            document.getElementById('appView').innerHTML = `
-                <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
-                    <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
-                    <div class="flex flex-wrap gap-2 mb-6 text-xs">
-                        <span class="bg-gray-800 px-3 py-1 rounded-full text-gray-300">${song.Artist || 'No Artist'}</span>
-                        <span class="bg-gray-800 px-3 py-1 rounded-full text-amber-400">Key: ${song.OriginalKey || 'N/A'}</span>
-                        <button onclick="toggleFav(${song.SongID})" class="px-3 py-1 rounded-full transition-all ${isFav ? 'bg-indigo-600/20 text-indigo-400' : 'bg-gray-800 text-gray-400'}">${isFav ? '★ Favorited' : '☆ Favorite'}</button>
-                    </div>
-                    <div id="sectionsContainer" class="space-y-4">
-                        ${Object.entries(grouped).map(([name, lines]) => `
-                            <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden">
-                                <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full text-left p-4 font-bold text-indigo-400 uppercase tracking-widest text-[10px] flex justify-between">
-                                    ${name} <span>▾</span>
-                                </button>
-                                <div class="p-4 pt-0">
-                                    ${lines.map(l => `
-                                        <div class="mb-2">
-                                            <div class="chord-line">${l.Chords || l.Type || ''}</div>
-                                            <div class="lyric-line">${l.Lyrics || Object.values(l)[4] || ''}</div>
-                                        </div>
-                                    `).join('')}
+            try {
+                const res = await fetch(`${SCRIPT_URL}?tab=SongLines`);
+                const allLines = await res.json();
+                const songLines = allLines.filter(line => String(line.SongID) === String(song.SongID));
+                const isFav = favorites.includes(String(song.SongID));
+                
+                appView.innerHTML = `
+                    <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
+                        <h2 class="text-3xl font-bold mb-2 text-white">${song.Title}</h2>
+                        <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
+                            <span class="bg-gray-800 px-3 py-1 rounded-full text-xs text-gray-300 font-semibold">${song.Artist || 'No Artist'}</span>
+                            <span class="bg-gray-800 px-3 py-1 rounded-full text-xs text-amber-400 font-semibold">Key: ${song.OriginalKey || 'N/A'}</span>
+                            <button onclick="toggleFav('${song.SongID}')" class="${isFav ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-gray-800 hover:bg-gray-700 text-gray-400'} px-3 py-1 rounded-full text-xs transition-all">
+                                ${isFav ? '★ Favorited' : '☆ Favorite'}
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            ${songLines.map(l => `
+                                <div>
+                                    <div class="chord-line">${l.Chords || ''}</div>
+                                    <div class="lyric-line">${l.Lyrics || ''}</div>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } catch(e) { appView.innerHTML = `<div class="text-red-500">Error loading song content.</div>`; }
         }
+
+        function toggleFav(id) {
+            if (favorites.includes(String(id))) {
+                favorites = favorites.filter(f => f !== String(id));
+            } else {
+                favorites.push(String(id));
+            }
+            localStorage.setItem('favs', JSON.stringify(favorites));
+            changeSong(currentSong); // Refresh view
+        }
+
+        function setTab(tab) { currentTab = tab; renderList(); }
+        function toggleAdmin() { isAdmin = !isAdmin; document.getElementById('addBtn').classList.toggle('hidden', !isAdmin); renderList(); }
+        function openForm() { document.getElementById('formModal').classList.remove('hidden'); }
+        function closeForm() { document.getElementById('formModal').classList.add('hidden'); }
+        async function submitForm() { showToast('Saving...'); closeForm(); }
 
         window.onload = initApp;
     </script>
