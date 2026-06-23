@@ -233,7 +233,15 @@
                     headers: { 'Content-Type': 'text/plain' }, // Avoids CORS preflight OPTIONS block
                     body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) 
                 });
-                const result = await res.json();
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch(parseError) {
+                    throw new Error("Server did not return valid JSON. Response: " + responseText.substring(0, 100));
+                }
+
                 if(result.status === "success") {
                     songs = songs.filter(s => s.SongID !== id);
                     renderList();
@@ -247,7 +255,8 @@
                     showToast('Deletion failed: ' + (result.message || 'Unauthorized'), 'error');
                 }
             } catch(e) {
-                showToast('Deletion request failed. Check connection.', 'error');
+                console.error("Deletion error Details:", e);
+                showToast('Delete request failed: ' + e.message, 'error');
             }
         }
 
@@ -321,7 +330,14 @@
                     body: JSON.stringify({ action, tab: 'Songs', id, values, secret: SECRET }) 
                 });
                 
-                const result = await response.json();
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch(parseError) {
+                    throw new Error("Server returned HTML or raw error, not JSON. Details: " + responseText.substring(0, 150));
+                }
+
                 if (result.status === 'success') {
                     closeForm();
                     showToast('Library updated successfully!', 'success');
@@ -334,8 +350,8 @@
                     showToast('Save failed: ' + (result.message || 'Unknown Error'), 'error');
                 }
             } catch(e) { 
-                console.error("Submission error", e);
-                showToast('Save failed. Check CORS constraints / script health.', 'error'); 
+                console.error("Submission details:", e);
+                showToast('Save failed: ' + e.message, 'error'); 
             } finally {
                 btn.innerText = 'SAVE';
                 btn.disabled = false;
