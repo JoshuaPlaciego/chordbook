@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worship Chordbook v0.9</title>
+    <title>Worship Chordbook v0.9.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
@@ -54,6 +54,7 @@
                         <input id="newArtist" placeholder="Artist" class="bg-gray-950 p-3 rounded border border-gray-800">
                         <input id="newKey" placeholder="Original Key" class="bg-gray-950 p-3 rounded border border-gray-800">
                     </div>
+                    <input id="newVersion" placeholder="Version (e.g. Acoustic, Live)" class="w-full bg-gray-950 p-3 rounded border border-gray-800">
                     <div id="sectionsContainer" class="space-y-6 pt-4 border-t border-gray-800"></div>
                     <button onclick="addSection()" class="w-full p-2 border border-dashed border-gray-600 text-gray-400 rounded hover:bg-gray-800">+ Add New Section</button>
                     <button onclick="saveSong()" class="w-full p-3 bg-green-600 rounded-lg font-bold">Save Song to Library</button>
@@ -91,7 +92,8 @@
                 song: {
                     title: document.getElementById('newTitle').value,
                     artist: document.getElementById('newArtist').value,
-                    key: document.getElementById('newKey').value
+                    key: document.getElementById('newKey').value,
+                    version: document.getElementById('newVersion').value
                 },
                 lines: []
             };
@@ -110,7 +112,7 @@
 
             const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
             const result = await res.json();
-            if(result.status === 'success') { alert('Saved!'); initApp(); }
+            if(result.status === 'success') { alert('Saved successfully!'); initApp(); }
             else { alert('Error: ' + result.message); }
         }
 
@@ -120,10 +122,10 @@
             document.getElementById('appView').innerHTML = `<div class="text-center mt-20">Loading...</div>`;
             const lines = await fetchTab('SongLines');
             const songLines = lines.filter(l => l.SongID == song.SongID);
-            document.getElementById('appView').innerHTML = `
+            appView.innerHTML = `
                 <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
                     <h2 class="text-2xl font-bold">${song.Title}</h2>
-                    <p class="text-gray-400 text-sm mb-6">${song.Artist || 'Unknown'} • Key: ${song.Key || 'N/A'}</p>
+                    <p class="text-gray-400 text-sm mb-6">${song.Artist || 'Unknown'} • Key: ${song.Key || 'N/A'} • Ver: ${song.Version || 'Standard'}</p>
                     <div class="space-y-4">${songLines.map(l => `<div><div class="chord-line">${l.Chords||''}</div><div class="lyric-line">${l.Lyrics||''}</div></div>`).join('')}</div>
                 </div>
             `;
