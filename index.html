@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worship Chordbook v0.9.4</title>
+    <title>Worship Chordbook v0.9.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
-        .lyric-line { color: #f1f5f9; font-size: 1.15rem; }
+        .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; white-space: pre-wrap; }
+        .lyric-line { color: #f1f5f9; font-size: 1.15rem; margin-bottom: 0.5rem; }
         #navDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        details summary { cursor: pointer; list-style: none; }
+        details summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="bg-[#0f1117] text-gray-100">
@@ -44,89 +46,47 @@
             container.innerHTML = songs.map(s => `<button class="block w-full text-left p-3 hover:bg-gray-800 rounded" onclick='changeSong(${JSON.stringify(s)})'>${s.Title}</button>`).join('');
         }
 
-        function showAddSongForm() {
-            toggleNav(false);
-            document.getElementById('pageTitle').innerText = "Add New Song";
-            document.getElementById('appView').innerHTML = `
-                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 space-y-4">
-                    <input id="newTitle" placeholder="Song Title" class="w-full bg-gray-950 p-3 rounded border border-gray-800">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="newArtist" placeholder="Artist" class="bg-gray-950 p-3 rounded border border-gray-800">
-                        <input id="newKey" placeholder="Original Key" class="bg-gray-950 p-3 rounded border border-gray-800">
-                    </div>
-                    <input id="newVersion" placeholder="Version (e.g. Acoustic, Live)" class="w-full bg-gray-950 p-3 rounded border border-gray-800">
-                    <div id="sectionsContainer" class="space-y-6 pt-4 border-t border-gray-800"></div>
-                    <button onclick="addSection()" class="w-full p-2 border border-dashed border-gray-600 text-gray-400 rounded hover:bg-gray-800">+ Add New Section</button>
-                    <button onclick="saveSong()" class="w-full p-3 bg-green-600 rounded-lg font-bold">Save Song to Library</button>
-                </div>
-            `;
-        }
-
-        function addSection() {
-            const container = document.getElementById('sectionsContainer');
-            const div = document.createElement('div');
-            div.className = "section-block bg-gray-950 p-4 rounded-xl border border-gray-800";
-            div.innerHTML = `
-                <input placeholder="e.g. Verse 1" class="section-title w-full bg-transparent font-bold mb-3 border-b border-gray-800 pb-1 outline-none text-indigo-400">
-                <div class="lines-container space-y-2 mb-3"></div>
-                <button onclick="addLine(this)" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold">+ Add Line</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function addLine(btn) {
-            const container = btn.parentElement.querySelector('.lines-container');
-            const div = document.createElement('div');
-            div.className = "song-line grid grid-cols-1 gap-1";
-            div.innerHTML = `
-                <input placeholder="Chords" class="chord-input w-full bg-gray-900 p-1 rounded text-sm border border-gray-800">
-                <input placeholder="Lyrics" class="lyric-input w-full bg-gray-900 p-1 rounded text-sm border border-gray-800">
-            `;
-            container.appendChild(div);
-        }
-
-        async function saveSong() {
-            const payload = {
-                action: 'bulkAdd',
-                secret: 'YOUR_SECRET_KEY',
-                song: {
-                    title: document.getElementById('newTitle').value,
-                    artist: document.getElementById('newArtist').value,
-                    key: document.getElementById('newKey').value,
-                    version: document.getElementById('newVersion').value
-                },
-                lines: []
-            };
-            
-            document.querySelectorAll('.section-block').forEach((section, sIdx) => {
-                const sectionName = section.querySelector('.section-title').value;
-                section.querySelectorAll('.song-line').forEach((line, lIdx) => {
-                    payload.lines.push({
-                        section: sectionName,
-                        order: lIdx + 1,
-                        chords: line.querySelector('.chord-input').value,
-                        lyrics: line.querySelector('.lyric-input').value
-                    });
-                });
-            });
-
-            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-            const result = await res.json();
-            if(result.status === 'success') { alert('Saved successfully!'); initApp(); }
-            else { alert('Error: ' + result.message); }
-        }
-
         async function changeSong(song) {
             document.getElementById('pageTitle').innerText = song.Title;
             toggleNav(false);
             document.getElementById('appView').innerHTML = `<div class="text-center mt-20">Loading...</div>`;
             const lines = await fetchTab('SongLines');
             const songLines = lines.filter(l => l.SongID == song.SongID);
-            appView.innerHTML = `
+            
+            const sections = {};
+            songLines.forEach(l => {
+                if(!sections[l.SectionName]) sections[l.SectionName] = [];
+                sections[l.SectionName].push(l);
+            });
+
+            const renderedSections = Object.keys(sections).map(sec => `
+                <details open class="group bg-gray-950 rounded-lg border border-gray-800 mb-2 overflow-hidden">
+                    <summary class="p-3 font-bold text-indigo-400 bg-gray-900 border-b border-gray-800 flex justify-between items-center">
+                        ${sec}
+                        <span class="text-lg font-light leading-none group-open:hidden">+</span>
+                        <span class="text-lg font-light leading-none hidden group-open:block">-</span>
+                    </summary>
+                    <div class="p-4">
+                        ${sections[sec].sort((a,b) => a.LineOrder - b.LineOrder).map(l => `
+                            <div class="mb-2">
+                                <div class="chord-line">${l.Chords || ''}</div>
+                                <div class="lyric-line">${l.Lyrics || ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </details>
+            `).join('');
+
+            document.getElementById('appView').innerHTML = `
                 <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
-                    <h2 class="text-2xl font-bold">${song.Title}</h2>
-                    <p class="text-gray-400 text-sm mb-6">${song.Artist || 'Unknown'} • Key: ${song.Key || 'N/A'} • Ver: ${song.Version || 'Standard'}</p>
-                    <div class="space-y-4">${songLines.map(l => `<div><div class="chord-line">${l.Chords||''}</div><div class="lyric-line">${l.Lyrics||''}</div></div>`).join('')}</div>
+                    <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
+                    <div class="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-6">
+                        <span>Artist: ${song.Artist || 'N/A'}</span>
+                        <span>•</span>
+                        <span>Key: ${song.Key || 'N/A'}</span>
+                        <button class="ml-auto px-3 py-1 bg-gray-800 hover:bg-indigo-900 rounded-full text-xs font-bold transition">★ FAVORITE</button>
+                    </div>
+                    <div class="space-y-1">${renderedSections}</div>
                 </div>
             `;
         }
