@@ -230,7 +230,7 @@
             try {
                 const res = await fetch(SCRIPT_URL, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' }, // Avoids CORS preflight OPTIONS block
                     body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) 
                 });
                 const result = await res.json();
@@ -317,7 +317,7 @@
             try {
                 const response = await fetch(SCRIPT_URL, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain' }, // Avoids CORS preflight OPTIONS block
                     body: JSON.stringify({ action, tab: 'Songs', id, values, secret: SECRET }) 
                 });
                 
