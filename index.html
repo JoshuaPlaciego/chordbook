@@ -9,284 +9,98 @@
         .chord-line { color: #fbbf24; font-weight: 700; font-family: monospace; }
         .lyric-line { color: #f1f5f9; font-size: 1.15rem; }
         #navDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Smooth fade transitions for modals */
-        .modal-transition {
-            transition: opacity 0.25s ease, transform 0.25s ease;
-        }
     </style>
 </head>
 <body class="bg-[#0f1117] text-gray-100 min-h-screen selection:bg-indigo-500/30 selection:text-white">
 
-    <!-- Sidebar Menu Drawer -->
     <div id="navDrawer" class="fixed inset-y-0 left-0 w-72 bg-[#171921] border-r border-gray-800 z-[100] transform -translate-x-full shadow-2xl flex flex-col">
         <div class="p-6 flex-1 overflow-y-auto">
             <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-6">Library Menu</h2>
-            <div class="grid grid-cols-3 gap-2 mb-6">
-                <button onclick="setTab('songs')" id="tab-songs" class="text-[9px] font-bold py-2 bg-gray-800 rounded transition-colors duration-150">SONGS</button>
-                <button onclick="setTab('setlists')" id="tab-setlists" class="text-[9px] font-bold py-2 hover:bg-gray-800 rounded transition-colors duration-150">SETS</button>
-                <button onclick="setTab('favorites')" id="tab-favorites" class="text-[9px] font-bold py-2 hover:bg-gray-800 rounded transition-colors duration-150">FAVS</button>
-            </div>
             <input type="text" id="searchInput" oninput="renderList()" placeholder="Search library..." class="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg text-sm mb-6 outline-none focus:border-indigo-500 transition-colors">
-            
-            <div class="flex items-center justify-between mb-2">
-                <div class="text-[9px] text-gray-500 uppercase tracking-widest" id="listHeader">All Songs</div>
-                <button onclick="toggleAdmin()" class="text-[9px] text-indigo-400 hover:text-indigo-300 uppercase font-bold tracking-wider transition-colors">Admin</button>
-            </div>
             <div id="sideContent" class="space-y-1">Loading...</div>
-            <button id="addBtn" onclick="openForm()" class="hidden w-full mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded shadow-lg shadow-indigo-600/20 transition-all">ADD NEW SONG</button>
-        </div>
-        <div class="p-6 border-t border-gray-800 bg-[#14161d]">
-            <h2 class="text-indigo-400 font-bold text-[9px] uppercase tracking-widest mb-3">Capabilities v0.5</h2>
-            <ul class="text-[10px] text-gray-500 space-y-1.5 font-mono">
-                <li>• Live Library Sync</li><li>• Real-time Search</li><li>• Private Favorites</li><li>• Setlist Integration</li><li>• Admin CRUD (v0.5)</li>
-            </ul>
         </div>
     </div>
     
-    <!-- Interaction Overlay -->
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/60 z-[90] hidden transition-opacity duration-300"></div>
     
-    <!-- Add/Edit Song Modal -->
-    <div id="formModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4 modal-transition opacity-0">
-        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm border border-gray-800 shadow-2xl transform scale-95 transition-transform duration-300" id="formModalContainer">
-            <h3 id="formTitle" class="text-lg font-bold mb-4 text-white">Add Song</h3>
-            <div class="space-y-3 mb-6">
-                <div>
-                    <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1 font-semibold">Song Title</label>
-                    <input type="text" id="fTitle" placeholder="e.g. Way Maker" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700 focus:border-indigo-500 outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1 font-semibold">Artist / Author</label>
-                    <input type="text" id="fArtist" placeholder="e.g. Sinach" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700 focus:border-indigo-500 outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1 font-semibold">Original Key</label>
-                    <input type="text" id="fKey" placeholder="e.g. C, G, Am" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700 focus:border-indigo-500 outline-none transition-colors">
-                </div>
-            </div>
-            <button id="submitBtn" onclick="submitForm()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/10">SAVE</button>
-            <button onclick="closeForm()" class="w-full mt-3 text-gray-400 text-xs hover:text-gray-200 transition-colors py-1">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Custom Confirmation Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/85 z-[210] hidden flex items-center justify-center p-4 modal-transition opacity-0">
-        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-xs border border-red-900/30 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="confirmModalContainer">
-            <div class="w-12 h-12 bg-red-950/50 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </div>
-            <h3 class="text-md font-bold mb-2 text-white">Delete Permanently?</h3>
-            <p class="text-xs text-gray-400 mb-6" id="confirmMessage">Are you sure you want to delete this song? This action cannot be undone.</p>
-            <div class="flex gap-2">
-                <button onclick="closeConfirmModal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 rounded-lg text-xs font-semibold transition-colors">Cancel</button>
-                <button id="confirmDeleteBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg text-xs font-semibold transition-colors">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-[220] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
-
-    <!-- Sticky Header -->
     <header class="sticky top-0 bg-[#0f1117]/95 backdrop-blur-md border-b border-gray-800 p-4 z-50 flex items-center gap-4">
-        <button onclick="toggleNav(true)" class="p-2.5 hover:bg-gray-800/80 rounded-lg text-indigo-400 flex items-center gap-2 font-bold text-xs tracking-wider border border-gray-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            MENU
-        </button>
-        <div class="flex flex-col min-w-0">
-            <h1 id="pageTitle" class="text-base font-bold truncate text-gray-100">Chordbook</h1>
-            <span class="text-[8px] text-gray-600 font-mono tracking-widest uppercase">v0.5 Complete</span>
-        </div>
+        <button onclick="toggleNav(true)" class="p-2.5 hover:bg-gray-800/80 rounded-lg text-indigo-400 border border-gray-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+        <div class="flex flex-col min-w-0"><h1 id="pageTitle" class="text-base font-bold truncate">Chordbook</h1></div>
     </header>
 
-    <!-- Main Content Panel -->
     <main id="appView" class="max-w-xl mx-auto p-5 pb-32">
-        <div class="text-center mt-20 text-gray-500">Loading your library...</div>
+        <div class="text-center mt-20 text-gray-500">Loading library...</div>
     </main>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXCeXackc_suAUMKCGJ6qIjMygAADB9zHmoJ5EqWU_OTmBxkgH9uHLP4nY427farS5/exec';
-        const SECRET = 'YOUR_SECRET_KEY';
-        let songs = [], setlists = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
-        let currentTab = 'songs', isAdmin = false, currentSong = null;
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `p-4 rounded-xl text-xs font-semibold shadow-2xl flex items-center gap-3 border pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
-                type === 'success' ? 'bg-[#0a1c12] text-green-400 border-green-900/50' : 
-                type === 'error' ? 'bg-[#1f0d0d] text-red-400 border-red-900/50' : 
-                'bg-[#13151c] text-indigo-400 border-indigo-900/50'
-            }`;
-            const icon = type === 'success' ? '✓' : type === 'error' ? '⚠' : 'ℹ';
-            toast.innerHTML = `<span class="text-base">${icon}</span><span class="flex-1">${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
-
-        async function fetchTab(tabName) { 
-            try { 
-                const res = await fetch(`${SCRIPT_URL}?tab=${tabName}`); 
-                return await res.json(); 
-            } catch(e) { 
-                showToast(`Failed to load ${tabName}`, 'error');
-                return []; 
-            } 
-        }
+        let songs = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
+        let currentSong = null;
+        
+        async function fetchTab(tabName) { try { const res = await fetch(`${SCRIPT_URL}?tab=${tabName}`); return await res.json(); } catch(e) { return []; } }
         
         async function initApp() { 
-            [songs, setlists] = await Promise.all([fetchTab('Songs'), fetchTab('Setlists')]); 
+            songs = await fetchTab('Songs');
             renderList();
-            const appView = document.getElementById('appView');
-            if (songs.length > 0) appView.innerHTML = `<div class="text-center mt-20 text-gray-500">Select a song or setlist from the Menu to begin.</div>`;
         }
 
         function renderList() {
             const container = document.getElementById('sideContent');
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            container.innerHTML = '';
-            let list = currentTab === 'songs' ? songs : (currentTab === 'favorites' ? songs.filter(s => favorites.includes(String(s.SongID))) : setlists);
-            let filteredList = list.filter(s => s.Title.toLowerCase().includes(query));
-            
-            if(filteredList.length === 0) {
-                container.innerHTML = `<div class="text-xs text-gray-600 p-3 italic">No items found</div>`;
-                return;
-            }
-
-            filteredList.forEach(s => {
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between hover:bg-gray-800 rounded-lg transition-colors group";
-                div.innerHTML = `
-                    <button class="flex-1 text-left p-3 text-sm text-gray-300 truncate" onclick="changeSong(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-                        ${s.Title}
-                    </button>
-                    ${isAdmin && currentTab === 'songs' ? `
-                        <button onclick="confirmDelete(${s.SongID}, '${s.Title.replace(/'/g, "\\'")}')" class="px-4 py-3 text-red-500 hover:text-red-400 font-bold text-xs transition-colors opacity-60 group-hover:opacity-100">X</button>
-                    ` : ''}
-                `;
-                container.appendChild(div);
-            });
+            container.innerHTML = songs.map(s => `<button class="block w-full text-left p-3 text-sm text-gray-300 hover:bg-gray-800 rounded-lg truncate" onclick='changeSong(${JSON.stringify(s)})'>${s.Title}</button>`).join('');
         }
 
-        let pendingDeleteId = null;
-        function confirmDelete(id, title) {
-            pendingDeleteId = id;
-            document.getElementById('confirmMessage').innerText = `Are you sure you want to permanently delete "${title}"? This cannot be undone.`;
-            const modal = document.getElementById('confirmModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('confirmModalContainer').classList.remove('scale-95'); }, 10);
-            document.getElementById('confirmDeleteBtn').onclick = executeDelete;
-        }
-
-        function closeConfirmModal() {
-            const modal = document.getElementById('confirmModal');
-            modal.classList.add('opacity-0');
-            document.getElementById('confirmModalContainer').classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); pendingDeleteId = null; }, 250);
-        }
-
-        async function executeDelete() {
-            if (!pendingDeleteId) return;
-            const id = pendingDeleteId;
-            closeConfirmModal();
-            showToast('Deleting song...', 'info');
-            try {
-                const res = await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'delete', tab: 'Songs', id: id, secret: SECRET }) 
-                });
-                const result = await res.json();
-                if(result.status === "success") {
-                    songs = songs.filter(s => s.SongID !== id);
-                    renderList();
-                    showToast('Song deleted successfully', 'success');
-                    if (currentSong && currentSong.SongID === id) {
-                        document.getElementById('appView').innerHTML = `<div class="text-center mt-20 text-gray-500">Select a song or setlist to begin.</div>`;
-                        document.getElementById('pageTitle').innerText = "Chordbook";
-                    }
-                } else showToast('Deletion failed', 'error');
-            } catch(e) { showToast('Connection failed', 'error'); }
-        }
+        function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
 
         function toggleFav(id) {
             id = String(id);
-            let isAdding = !favorites.includes(id);
-            if (isAdding) { favorites.push(id); showToast('Added to Favorites', 'success'); }
-            else { favorites = favorites.filter(f => f !== id); showToast('Removed from Favorites', 'info'); }
+            if (favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
             localStorage.setItem('favs', JSON.stringify(favorites));
-            renderList();
-            if (currentSong && currentSong.SongID == id) changeSong(currentSong);
+            changeSong(currentSong);
         }
-
-        function openForm(song) {
-            currentSong = song || null;
-            document.getElementById('formTitle').innerText = song ? 'Edit Song details' : 'Add New Song';
-            document.getElementById('fTitle').value = song ? song.Title : '';
-            document.getElementById('fArtist').value = song ? (song.Artist || '') : '';
-            document.getElementById('fKey').value = song ? (song.OriginalKey || '') : '';
-            const modal = document.getElementById('formModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('formModalContainer').classList.remove('scale-95'); }, 10);
-        }
-
-        function closeForm() { 
-            const modal = document.getElementById('formModal');
-            modal.classList.add('opacity-0');
-            document.getElementById('formModalContainer').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 250);
-        }
-
-        async function submitForm() {
-            const btn = document.getElementById('submitBtn');
-            const action = currentSong ? 'edit' : 'add';
-            const id = currentSong ? currentSong.SongID : Date.now();
-            const titleValue = document.getElementById('fTitle').value.trim();
-            if (!titleValue) { showToast("Title required.", "error"); return; }
-            btn.innerText = 'SAVING...'; btn.disabled = true;
-            try {
-                const response = await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, tab: 'Songs', id, values: [id, titleValue, document.getElementById('fArtist').value.trim(), document.getElementById('fKey').value.trim()], secret: SECRET }) 
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    closeForm();
-                    await initApp();
-                    if(currentSong) changeSong(songs.find(s => s.SongID == id) || currentSong);
-                } else showToast('Save failed', 'error');
-            } catch(e) { showToast('Save failed.', 'error'); } finally { btn.innerText = 'SAVE'; btn.disabled = false; }
-        }
-
-        function toggleAdmin() { isAdmin = !isAdmin; document.getElementById('addBtn').classList.toggle('hidden', !isAdmin); renderList(); showToast(isAdmin ? 'Admin unlocked' : 'Admin locked', 'info'); }
-        function toggleNav(show) { document.getElementById('navDrawer').classList.toggle('-translate-x-full', !show); document.getElementById('overlay').classList.toggle('hidden', !show); }
-        function setTab(tab) { currentTab = tab; document.querySelectorAll('.grid button').forEach(b => b.classList.replace('bg-gray-800', 'hover:bg-gray-800')); document.getElementById(`tab-${tab}`).classList.replace('hover:bg-gray-800', 'bg-gray-800'); renderList(); }
 
         async function changeSong(song) {
             currentSong = song;
             document.getElementById('pageTitle').innerText = song.Title;
             toggleNav(false);
-            const appView = document.getElementById('appView');
-            appView.innerHTML = `<div class="p-6 bg-gray-900 rounded-2xl border border-gray-800 text-center">Loading...</div>`;
             const allLines = await fetchTab('SongLines');
-            const songLines = allLines.filter(line => line.SongID == song.SongID);
+            const songLines = allLines
+                .filter(line => line.SongID == song.SongID)
+                .sort((a, b) => (parseInt(a.LineOrder) || 0) - (parseInt(b.LineOrder) || 0));
+                
+            const grouped = songLines.reduce((acc, line) => {
+                const section = line.SectionName || "Lyrics";
+                if (!acc[section]) acc[section] = [];
+                acc[section].push(line);
+                return acc;
+            }, {});
+            
             const isFav = favorites.includes(String(song.SongID));
-            appView.innerHTML = `
+
+            document.getElementById('appView').innerHTML = `
                 <div class="p-6 bg-gray-900 rounded-2xl border border-gray-800">
-                    <h2 class="text-3xl font-bold mb-2 text-white">${song.Title}</h2>
-                    <div class="flex flex-wrap gap-2 mb-6 text-sm text-indigo-300">
-                        <span class="bg-gray-800 px-3 py-1 rounded-full text-xs text-gray-300">${song.Artist || 'No Artist'}</span>
-                        <span class="bg-gray-800 px-3 py-1 rounded-full text-xs text-amber-400">Key: ${song.OriginalKey || 'N/A'}</span>
-                        <button onclick="toggleFav(${song.SongID})" class="${isFav ? 'bg-indigo-600/20 text-indigo-400' : 'bg-gray-800 text-gray-400'} px-3 py-1 rounded-full text-xs transition-all">${isFav ? '★ Favorited' : '☆ Favorite'}</button>
+                    <h2 class="text-3xl font-bold mb-2">${song.Title}</h2>
+                    <div class="flex flex-wrap gap-2 mb-6 text-xs">
+                        <span class="bg-gray-800 px-3 py-1 rounded-full text-gray-300">${song.Artist || 'No Artist'}</span>
+                        <span class="bg-gray-800 px-3 py-1 rounded-full text-amber-400">Key: ${song.OriginalKey || 'N/A'}</span>
+                        <button onclick="toggleFav(${song.SongID})" class="px-3 py-1 rounded-full transition-all ${isFav ? 'bg-indigo-600/20 text-indigo-400' : 'bg-gray-800 text-gray-400'}">${isFav ? '★ Favorited' : '☆ Favorite'}</button>
                     </div>
-                    <div class="space-y-4">
-                        ${songLines.map(l => `<div><div class="chord-line">${l.Chords || ''}</div><div class="lyric-line">${l.Lyrics || ''}</div></div>`).join('')}
+                    <div id="sectionsContainer" class="space-y-4">
+                        ${Object.entries(grouped).map(([name, lines]) => `
+                            <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden">
+                                <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full text-left p-4 font-bold text-indigo-400 uppercase tracking-widest text-[10px] flex justify-between">
+                                    ${name} <span>▾</span>
+                                </button>
+                                <div class="p-4 pt-0">
+                                    ${lines.map(l => `
+                                        <div class="mb-2">
+                                            <div class="chord-line">${l.Type || ''}</div>
+                                            <div class="lyric-line">${l.Lyrics || ''}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
