@@ -11,7 +11,16 @@
         #navDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="bg-[#0f1117] text-gray-100 min-h-screen">
+<body class="bg-[#0f1117] text-gray-100 min-h-screen flex">
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="w-64 bg-gray-900 h-screen p-4 border-r border-gray-800 overflow-y-auto">
+        <h1 class="text-xl font-bold mb-6">Chordbook</h1>
+        <div id="songList">
+            <!-- Your song list items populated by JS -->
+            <p class="text-sm text-gray-500">Loading songs...</p>
+        </div>
+    </div>
 
     <!-- Add Line Modal -->
     <div id="lineModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4">
@@ -34,7 +43,7 @@
     </div>
 
     <!-- Main View -->
-    <div id="appView" class="p-6">
+    <div id="appView" class="flex-1 p-6 overflow-y-auto">
         <div class="text-center mt-20 text-gray-500">Please select a song from the sidebar.</div>
     </div>
 
@@ -43,10 +52,20 @@
         let currentSong = null;
         let allLines = [];
 
-        // Initialization trigger
-        window.onload = () => {
-            console.log("App initialized.");
-            // Add your logic here to load and render your song list sidebar
+        window.onload = async () => {
+            // Load your songs list here to populate the sidebar
+            try {
+                const response = await fetch(SCRIPT_URL + '?tab=Songs');
+                const songs = await response.json();
+                const songList = document.getElementById('songList');
+                songList.innerHTML = songs.map(s => `
+                    <div onclick='changeSong(${JSON.stringify(s)})' class="cursor-pointer p-2 hover:bg-gray-800 rounded mb-1">
+                        ${s.Title}
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Error loading songs:", err);
+            }
         };
 
         async function changeSong(song) {
