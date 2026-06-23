@@ -47,6 +47,17 @@
     <!-- Interaction Overlay -->
     <div id="overlay" onclick="toggleNav(false)" class="fixed inset-0 bg-black/60 z-[90] hidden transition-opacity duration-300"></div>
     
+    <!-- Admin Verification Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4 modal-transition opacity-0">
+        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm border border-gray-800 shadow-2xl transform scale-95 transition-transform duration-300" id="adminModalContainer">
+            <h3 class="text-lg font-bold mb-2 text-white">Unlock Admin Mode</h3>
+            <p class="text-xs text-gray-400 mb-4">Enter the Secret Key configured in your Google Apps Script configuration file to authenticate writes.</p>
+            <input type="password" id="adminSecretInput" placeholder="Enter Secret Key" class="w-full bg-gray-800 p-3 rounded-lg text-sm text-white border border-gray-700 focus:border-indigo-500 outline-none transition-colors mb-4">
+            <button onclick="submitAdminSecret()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/10">Unlock Admin</button>
+            <button onclick="closeAdminModal()" class="w-full mt-3 text-gray-400 text-xs hover:text-gray-200 transition-colors py-1">Cancel</button>
+        </div>
+    </div>
+
     <!-- Add/Edit Song Modal -->
     <div id="formModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center p-4 modal-transition opacity-0">
         <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm border border-gray-800 shadow-2xl transform scale-95 transition-transform duration-300" id="formModalContainer">
@@ -107,7 +118,7 @@
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywWSLvZgnf1eBR5Uf0vWV24bmDTLr7p3LD0RdzI9qAozL4n2yqUWxHhAWzlaMOFfhU/exec';
-        const SECRET = 'YOUR_SECRET_KEY';
+        let SECRET = localStorage.getItem('adminSecret') || ''; // Load saved secret dynamically!
         let songs = [], setlists = [], favorites = JSON.parse(localStorage.getItem('favs') || '[]');
         let currentTab = 'songs', isAdmin = false, currentSong = null;
 
@@ -277,6 +288,52 @@
             }
         }
 
+        // Custom Admin Modal Controllers
+        function toggleAdmin() { 
+            if (isAdmin) {
+                isAdmin = false; 
+                document.getElementById('addBtn').classList.add('hidden'); 
+                renderList(); 
+                showToast('Admin controls locked', 'info');
+            } else {
+                // Pre-fill input if there's already a saved secret key
+                document.getElementById('adminSecretInput').value = SECRET;
+                
+                const modal = document.getElementById('adminModal');
+                const container = document.getElementById('adminModalContainer');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    container.classList.remove('scale-95');
+                }, 10);
+            }
+        }
+
+        function closeAdminModal() {
+            const modal = document.getElementById('adminModal');
+            const container = document.getElementById('adminModalContainer');
+            modal.classList.add('opacity-0');
+            container.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 250);
+        }
+
+        function submitAdminSecret() {
+            const inputVal = document.getElementById('adminSecretInput').value.trim();
+            if (!inputVal) {
+                showToast("Please enter your database Secret Key to authenticate.", "error");
+                return;
+            }
+            SECRET = inputVal;
+            localStorage.setItem('adminSecret', SECRET); // Cache so user is spared re-typing
+            isAdmin = true;
+            document.getElementById('addBtn').classList.remove('hidden');
+            renderList();
+            closeAdminModal();
+            showToast('Admin controls unlocked successfully', 'success');
+        }
+
         function openForm(song) {
             currentSong = song || null;
             document.getElementById('formTitle').innerText = song ? 'Edit Song details' : 'Add New Song';
@@ -356,13 +413,6 @@
                 btn.innerText = 'SAVE';
                 btn.disabled = false;
             }
-        }
-
-        function toggleAdmin() { 
-            isAdmin = !isAdmin; 
-            document.getElementById('addBtn').classList.toggle('hidden', !isAdmin); 
-            renderList(); 
-            showToast(isAdmin ? 'Admin controls unlocked' : 'Admin controls locked', 'info');
         }
 
         // Sidebar Drawer and tab handling
