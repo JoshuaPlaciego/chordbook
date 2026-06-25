@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Worship Chordbook v0.8</title>
+<!-- Premium Typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 /* Micro-interactivity & Ambient Animations */
@@ -12,7 +16,61 @@ body {
                 radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
                 #07080e;
     background-attachment: fixed;
+    font-family: 'Inter', sans-serif;
 }
+
+/* Pro Depth-of-Field Sparkle Engine */
+.dust-particles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.dust-layer {
+    position: absolute; inset: -20%; /* Bleed area to allow horizontal swaying */
+    background-repeat: repeat;
+}
+/* Sharp Midground */
+.dust-layer-1 {
+    background-image: 
+        radial-gradient(1.5px 1.5px at 10% 20%, rgba(255, 255, 255, 0.8) 50%, transparent),
+        radial-gradient(2px 2px at 40% 60%, rgba(199, 210, 254, 0.9) 50%, transparent),
+        radial-gradient(1px 1px at 80% 30%, rgba(255, 255, 255, 0.7) 50%, transparent);
+    background-size: 150px 150px;
+    animation: dustFloat 25s linear infinite, dustSway 8s ease-in-out infinite alternate;
+}
+/* Twinkling Background */
+.dust-layer-2 {
+    background-image: 
+        radial-gradient(2.5px 2.5px at 30% 70%, rgba(255, 255, 255, 1) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 70% 10%, rgba(165, 180, 252, 0.8) 50%, transparent),
+        radial-gradient(3px 3px at 90% 80%, rgba(255, 255, 255, 0.9) 50%, transparent);
+    background-size: 250px 250px;
+    animation: dustFloat 40s linear infinite, dustSway 12s ease-in-out infinite alternate-reverse, sparklePulse 3s ease-in-out infinite alternate;
+    filter: blur(1px);
+    opacity: 0.7;
+}
+/* Blurred Foreground (Parallax Depth) */
+.dust-layer-3 {
+    background-image: 
+        radial-gradient(4px 4px at 20% 40%, rgba(255, 255, 255, 0.5) 50%, transparent),
+        radial-gradient(6px 6px at 80% 60%, rgba(165, 180, 252, 0.3) 50%, transparent);
+    background-size: 350px 350px;
+    animation: dustFloat 60s linear infinite, dustSway 20s ease-in-out infinite alternate;
+    filter: blur(4px);
+    opacity: 0.8;
+}
+
+@keyframes dustFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+@keyframes dustSway {
+    0% { transform: translateX(-20px); }
+    100% { transform: translateX(20px); }
+}
+@keyframes sparklePulse {
+    0% { opacity: 0.3; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.1); }
+}
+
 .chord-line { 
     color: #fbbf24; 
     font-weight: 700; 
@@ -41,12 +99,24 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-/* Animated details chevron */
-details summary .chevron-icon {
-    transition: transform 0.2s ease;
+/* Ultra-Smooth Expand/Collapse Engine */
+.panel-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+    opacity: 0;
+    visibility: hidden;
 }
-details[open] summary .chevron-icon {
-    transform: rotate(180deg);
+.panel-wrap.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+}
+.panel-inner {
+    overflow: hidden;
+}
+.chevron-icon {
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Active Line Focus System */
@@ -89,37 +159,174 @@ details[open] summary .chevron-icon {
     border-color: rgba(244, 63, 94, 0.5) !important;
 }
 
-/* Custom Tooltip Styling */
+/* Custom Tooltip Styling with Pointer Triangle */
 #chordTooltip {
     transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
+#chordTooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: rgba(16, 17, 26, 0.95) transparent transparent transparent;
+}
+
+/* Music Note Loading Animation */
+@keyframes music-float {
+    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3)); }
+    50% { transform: translateY(-8px) scale(1.05); filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.8)); }
+}
+.animate-music-float {
+    animation: music-float 1.5s ease-in-out infinite;
+}
+
+/* Smooth Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Blur Fade In (Modern Dashboard Reveal) */
+@keyframes blurFadeInUp {
+    0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.animate-blur-fade {
+    animation: blurFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+
+/* Shimmer Text Effect */
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.text-shimmer {
+    background: linear-gradient(90deg, #818CF8 0%, #C084FC 25%, #38BDF8 50%, #818CF8 75%, #C084FC 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* 5D Ripple Effect */
+@keyframes ripple-5d {
+    0% { 
+        transform: scale(0.6); 
+        opacity: 1; 
+        border-width: 4px;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.8), inset 0 0 20px rgba(99, 102, 241, 0.8);
+    }
+    100% { 
+        transform: scale(2.5); 
+        opacity: 0; 
+        border-width: 1px;
+        box-shadow: 0 0 50px rgba(99, 102, 241, 0), inset 0 0 50px rgba(99, 102, 241, 0);
+    }
+}
+.ripple-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border-style: solid; border-color: rgba(165, 180, 252, 0.6);
+    animation: ripple-5d 3s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+.ripple-ring:nth-child(2) { animation-delay: -1s; }
+.ripple-ring:nth-child(3) { animation-delay: -2s; }
+
+/* 5D Professional Buttons */
+.btn-5d {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+}
+.btn-5d:hover {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+.btn-5d:active {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    transform: translateY(1px) scale(0.96);
+}
+
+.btn-5d-primary {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.3) 0%, rgba(79, 70, 229, 0.2) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-top: 1px solid rgba(129, 140, 248, 0.5);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25), inset 0 1px 0 rgba(165, 180, 252, 0.25);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+}
+.btn-5d-primary:hover {
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.4) 0%, rgba(79, 70, 229, 0.3) 100%);
+    border-top: 1px solid rgba(165, 180, 252, 0.7);
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.35), inset 0 1px 0 rgba(199, 210, 254, 0.4);
+    transform: translateY(-1px);
+}
+.btn-5d-primary:active {
+    background: rgba(55, 48, 163, 0.5);
+    border-top: 1px solid rgba(79, 70, 229, 0.3);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    transform: translateY(1px) scale(0.96);
+}
+
+/* Arranger Action Button Hover Tooltips */
+.arranger-btn:hover .arranger-tooltip { opacity: 1; transform: translate(-50%, 0); visibility: visible; }
+.arranger-tooltip { transition: opacity 0.2s ease, transform 0.2s ease; transform: translate(-50%, 4px); visibility: hidden; opacity: 0; }
 </style>
 </head>
 <body class="text-gray-100 min-h-screen selection:bg-indigo-500/30 selection:text-white bg-fixed">
 
-<div id="navDrawer" class="fixed inset-y-0 left-0 w-72 bg-[#06070a]/95 backdrop-blur-3xl z-[100] transform -translate-x-full shadow-[4px_0_32px_rgba(0,0,0,0.7)] flex flex-col transition-transform duration-300 border-r border-white/5">
+<!-- Ambient Dust Particles -->
+<div class="dust-particles">
+    <div class="dust-layer dust-layer-1"></div>
+    <div class="dust-layer dust-layer-2"></div>
+    <div class="dust-layer dust-layer-3"></div>
+</div>
+
+<div id="navDrawer" class="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl z-[100] transform -translate-x-full shadow-[4px_0_40px_rgba(49,46,129,0.5)] flex flex-col transition-transform duration-300 border-r border-indigo-500/20">
     <!-- Drawer Header & Search Controls -->
-    <div class="p-6 pb-2 flex-shrink-0">
+    <div class="p-5 sm:p-6 pb-2 flex-shrink-0">
         <h2 class="text-indigo-400 font-bold text-[10px] uppercase tracking-widest mb-4 flex items-center gap-2 select-none">
             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
             Library Menu
         </h2>
+        <button id="addBtn" onclick="window.openForm()" class="hidden w-full mb-4 py-2.5 btn-5d-primary text-white text-[10px] font-bold tracking-wider rounded-xl flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+            ADD NEW SONG
+        </button>
         <div class="grid grid-cols-3 gap-2 mb-4">
-            <button onclick="window.setTab('songs')" id="tab-songs" class="text-[9px] font-bold py-2 bg-white/10 rounded-xl transition-all hover:bg-white/15 active:scale-95 text-white border border-white/5">SONGS</button>
-            <button onclick="window.setTab('setlists')" id="tab-setlists" class="text-[9px] font-bold py-2 hover:bg-white/5 rounded-xl transition-all hover:bg-white/10 active:scale-95 text-gray-400 hover:text-white">SETS</button>
-            <button onclick="window.setTab('favorites')" id="tab-favorites" class="text-[9px] font-bold py-2 hover:bg-white/5 rounded-xl transition-all hover:bg-white/10 active:scale-95 text-gray-400 hover:text-white">FAVS</button>
+            <button onclick="window.setTab('songs')" id="tab-songs" class="text-[9px] font-bold py-2 bg-indigo-600/40 rounded-xl transition-all hover:bg-indigo-500/50 active:scale-95 text-white border border-indigo-400/50 shadow-md">SONGS</button>
+            <button onclick="window.setTab('setlists')" id="tab-setlists" class="text-[9px] font-bold py-2 bg-indigo-950/20 hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 text-indigo-300/60 hover:text-indigo-200 border border-indigo-500/20">SETS</button>
+            <button onclick="window.setTab('favorites')" id="tab-favorites" class="text-[9px] font-bold py-2 bg-indigo-950/20 hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 text-indigo-300/60 hover:text-indigo-200 border border-indigo-500/20">FAVS</button>
         </div>
-        <div class="relative">
-            <input type="text" id="searchInput" oninput="window.renderList()" placeholder="Quick search catalog..." class="w-full bg-black/40 text-white p-3 pr-8 rounded-xl text-sm outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner placeholder-gray-500 transition-all border border-white/5">
-            <button onclick="window.clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="relative mt-2">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchInput" oninput="window.renderList()" placeholder="Search catalog..." class="w-full bg-indigo-900/30 text-indigo-100 py-3.5 pl-10 pr-10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
+            <button onclick="window.clearSearch()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-indigo-300/50 hover:text-indigo-200 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
     </div>
 
     <!-- Scrollable Catalog Area with A-Z Quick Index -->
     <div class="relative flex-1 flex overflow-hidden">
-        <div id="sideContentScroll" class="pl-6 pr-8 flex-1 overflow-y-auto pb-4">
+        <div id="sideContentScroll" class="pl-5 sm:pl-6 pr-8 flex-1 overflow-y-auto pb-4">
             <div class="flex items-center justify-between mb-2 select-none">
                 <div class="text-[9px] text-gray-500 uppercase tracking-widest" id="listHeader">All Songs</div>
             </div>
@@ -129,8 +336,8 @@ details[open] summary .chevron-icon {
         <div id="quickIndexBar" class="absolute right-1.5 inset-y-0 w-5 flex flex-col justify-center items-center gap-0.5 text-[8px] font-bold text-gray-500 select-none py-2 z-10"></div>
     </div>
 
-    <!-- Drawer Capabilities Panel & Add Button -->
-    <div class="p-6 pt-4 border-t border-white/5 bg-black/25 backdrop-blur-md flex-shrink-0 space-y-4">
+    <!-- Drawer Capabilities Panel -->
+    <div class="p-5 sm:p-6 pt-4 border-t border-indigo-500/20 bg-indigo-950/30 backdrop-blur-md flex-shrink-0 space-y-4 shadow-[inset_0_10px_20px_rgba(0,0,0,0.2)]">
         <div class="select-none">
             <h3 class="text-[9px] text-indigo-400/80 font-bold uppercase tracking-widest mb-2.5">Live Capabilities</h3>
             <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 font-semibold select-none">
@@ -153,165 +360,190 @@ details[open] summary .chevron-icon {
             </div>
             <p class="text-[8px] text-gray-500 mt-2.5 text-center italic leading-tight">Tap any line block to isolate & focus; use on-the-fly metronome pulse and scroll engine.</p>
         </div>
-
-        <button id="addBtn" onclick="window.openForm()" class="hidden w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-900/30 text-white text-xs font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-2 border border-white/5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            ADD NEW SONG
-        </button>
     </div>
 </div>
 <div id="overlay" onclick="window.toggleNav(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden transition-opacity"></div>
 
 <!-- Interactive Guitar Chord Diagram Tooltip -->
-<div id="chordTooltip" class="absolute hidden z-[500] bg-[#10111a]/95 backdrop-blur-xl border border-white/15 p-4 rounded-2xl shadow-2xl w-44 pointer-events-auto">
+<div id="chordTooltip" class="absolute hidden z-[500] bg-[#10111a]/95 backdrop-blur-xl border border-white/15 border-b-0 p-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-44 pointer-events-auto">
     <div class="flex justify-between items-center mb-2">
         <span id="tooltipChordName" class="text-xs font-bold text-amber-400 font-mono">Chord</span>
-        <button onclick="window.hideChordTooltip()" class="text-gray-500 hover:text-white text-xs">✕</button>
+        <button onclick="window.hideChordTooltip()" class="text-gray-500 hover:text-white text-xs p-1 transition-colors">✕</button>
     </div>
     <div id="tooltipFretboard" class="w-full flex justify-center"></div>
 </div>
 
 <!-- Admin Password Modal -->
 <div id="adminModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] modal-overlay modal-hidden flex items-center justify-center p-4">
-    <div class="bg-[#0f111a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-sm shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/5 modal-content">
+    <div class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-sm shadow-[0_20px_50px_rgba(49,46,129,0.5)] border border-indigo-500/20 modal-content">
         <div class="flex justify-center mb-3">
-            <div class="p-3 bg-indigo-500/10 rounded-full text-indigo-400 border border-indigo-500/20">
+            <div class="p-3 bg-indigo-500/10 rounded-full text-indigo-400 border border-indigo-500/20 shadow-[inset_0_0_15px_rgba(99,102,241,0.1)]">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             </div>
         </div>
         <h3 class="text-lg font-bold mb-4 text-white text-center tracking-wide select-none">Admin Authentication</h3>
-        <input type="text" id="adminUser" placeholder="Username" class="w-full bg-black/40 p-3.5 rounded-xl text-sm text-center text-white outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner transition-all border border-white/5 mb-3">
-        <input type="password" id="adminPassword" placeholder="Passkey" class="w-full bg-black/40 p-3.5 rounded-xl text-sm text-center text-white outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner transition-all border border-white/5 mb-4">
+        <input type="text" id="adminUser" placeholder="Username" class="w-full bg-indigo-900/30 text-indigo-100 py-3.5 rounded-xl text-sm text-center outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50 mb-3">
+        <input type="password" id="adminPassword" placeholder="Passkey" class="w-full bg-indigo-900/30 text-indigo-100 p-3.5 rounded-xl text-sm text-center outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50 mb-4">
         <div class="flex gap-3">
-            <button onclick="window.closeAdminModal()" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold rounded-xl active:scale-95 transition-all">CANCEL</button>
-            <button onclick="window.verifyAdmin()" class="flex-1 py-3 bg-indigo-600/90 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg active:scale-95 transition-all">UNLOCK</button>
+            <button onclick="window.closeAdminModal()" class="flex-1 py-3 btn-5d text-gray-300 text-xs font-bold rounded-xl active:scale-95 transition-all">CANCEL</button>
+            <button onclick="window.verifyAdmin()" class="flex-1 py-3 btn-5d-primary text-white text-xs font-bold rounded-xl shadow-lg active:scale-95 transition-all">UNLOCK</button>
         </div>
     </div>
 </div>
 
 <!-- Key Shortcuts Overlay Modal -->
 <div id="shortcutsModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] modal-overlay modal-hidden flex items-center justify-center p-4">
-    <div class="bg-[#0f111a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-sm shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/5 modal-content">
-        <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+    <div class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-sm shadow-[0_20px_50px_rgba(49,46,129,0.5)] border border-indigo-500/20 modal-content">
+        <div class="flex justify-between items-center mb-4 border-b border-indigo-500/20 pb-3">
+            <h3 class="text-xs font-bold text-indigo-200 uppercase tracking-wider flex items-center gap-2">
                 ⌨ Musician Hotkeys
             </h3>
-            <button onclick="window.closeShortcutsModal()" class="text-gray-500 hover:text-white text-xs">✕</button>
+            <button onclick="window.closeShortcutsModal()" class="text-indigo-400/60 hover:text-white text-xs p-1 transition-colors">✕</button>
         </div>
-        <div class="space-y-3.5 text-xs text-gray-300">
+        <div class="space-y-3.5 text-xs text-indigo-100/80">
             <div class="flex justify-between items-center">
                 <span>Play/Pause Autoscroll</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">Space</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">Space</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Transpose Down</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">[</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">[</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Transpose Up</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">]</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">]</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Zoom Out Font</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">-</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">-</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Zoom In Font</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">=</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">=</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Dismiss Popups</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">Esc</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">Esc</kbd>
             </div>
             <div class="flex justify-between items-center">
                 <span>Toggle Fullscreen</span>
-                <kbd class="px-2 py-1 bg-white/10 rounded font-mono text-[10px] text-white">F</kbd>
+                <kbd class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded font-mono text-[10px] text-indigo-200 shadow-sm">F</kbd>
             </div>
         </div>
-        <button onclick="window.closeShortcutsModal()" class="w-full mt-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold active:scale-95 transition-all">Got it!</button>
+        <button onclick="window.closeShortcutsModal()" class="w-full mt-5 py-2.5 btn-5d-primary text-white rounded-xl text-xs font-bold active:scale-95 transition-all">Got it!</button>
     </div>
 </div>
 
 <!-- Add/Edit Song Form Modal -->
 <div id="formModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] modal-overlay modal-hidden flex items-center justify-center p-4">
-<div class="bg-[#0f111a]/95 backdrop-blur-3xl p-6 md:p-8 rounded-3xl w-full max-w-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/5 flex flex-col max-h-[95vh] md:max-h-[90vh] modal-content">
+<div class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl p-5 sm:p-8 rounded-3xl w-full max-w-xl shadow-[0_20px_50px_rgba(49,46,129,0.5)] border border-indigo-500/20 flex flex-col max-h-[95vh] md:max-h-[90vh] modal-content">
 <div class="flex-shrink-0">
-    <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-4 select-none">
-        <h3 id="formTitle" class="text-xl font-bold text-white">Add New Song</h3>
-        <button onclick="window.closeForm()" class="p-1.5 hover:bg-white/10 rounded-lg text-gray-500 hover:text-white transition-colors">
+    <div class="flex items-center justify-between mb-4 border-b border-indigo-500/20 pb-4 select-none">
+        <h3 id="formTitle" class="text-lg sm:text-xl font-bold text-white tracking-wide">Add New Song</h3>
+        <button onclick="window.closeForm()" class="p-1.5 hover:bg-white/10 rounded-lg text-indigo-400/60 hover:text-white transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
     </div>
-<div class="space-y-3 mb-4 pb-4 border-b border-white/5">
-<input type="text" id="fTitle" placeholder="Song Title" class="w-full bg-black/40 p-3 rounded-xl text-sm text-white outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner border border-white/5 transition-colors">
-<input type="text" id="fArtist" placeholder="Artist" class="w-full bg-black/40 p-3 rounded-xl text-sm text-white outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner border border-white/5 transition-colors">
-<select id="fKey" class="w-full bg-black/40 p-3 rounded-xl text-sm text-gray-300 outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner border border-white/5 transition-colors appearance-none cursor-pointer" onchange="window.updateKeyFamily(this); window.validateKeyConsistency()">
-<option value="" disabled selected>Select Original Key...</option>
-<option value="C">C</option><option value="C#">C#</option><option value="Db">Db</option>
-<option value="D">D</option><option value="Eb">Eb</option><option value="E">E</option>
-<option value="F">F</option><option value="F#">F#</option><option value="Gb">Gb</option>
-<option value="G">G</option><option value="Ab">Ab</option><option value="A">A</option>
-<option value="Bb">Bb</option><option value="B">B</option>
+<div class="space-y-3 mb-4 pb-4 border-b border-indigo-500/20">
+<input type="text" id="fTitle" placeholder="Song Title" class="w-full bg-indigo-900/30 text-indigo-100 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
+<input type="text" id="fArtist" placeholder="Artist" class="w-full bg-indigo-900/30 text-indigo-100 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
+<select id="fKey" class="w-full bg-indigo-900/30 text-indigo-100 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50 appearance-none cursor-pointer" onchange="window.updateKeyFamily(this); window.validateKeyConsistency()">
+<option value="" disabled selected class="bg-[#0a0b16] text-gray-400">Select Original Key...</option>
+<option value="C" class="bg-[#0a0b16]">C</option><option value="C#" class="bg-[#0a0b16]">C#</option><option value="Db" class="bg-[#0a0b16]">Db</option>
+<option value="D" class="bg-[#0a0b16]">D</option><option value="Eb" class="bg-[#0a0b16]">Eb</option><option value="E" class="bg-[#0a0b16]">E</option>
+<option value="F" class="bg-[#0a0b16]">F</option><option value="F#" class="bg-[#0a0b16]">F#</option><option value="Gb" class="bg-[#0a0b16]">Gb</option>
+<option value="G" class="bg-[#0a0b16]">G</option><option value="Ab" class="bg-[#0a0b16]">Ab</option><option value="A" class="bg-[#0a0b16]">A</option>
+<option value="Bb" class="bg-[#0a0b16]">Bb</option><option value="B" class="bg-[#0a0b16]">B</option>
 </select>
 <div id="keyFamilyDisplay" class="hidden"></div>
 <!-- Smart Key Consistency Warning Box -->
 <div id="keyMismatchWarning" class="hidden mt-2 p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs rounded-xl leading-relaxed"></div>
-<input type="text" id="fVersion" placeholder="Version (e.g. 1.0)" class="w-full bg-black/40 p-3 rounded-xl text-sm text-white outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner border border-white/5 transition-colors">
+<input type="text" id="fVersion" placeholder="Version (e.g. 1.0)" class="w-full bg-indigo-900/30 text-indigo-100 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
 </div>
 </div>
 
 <div class="overflow-y-auto flex-1 pr-1 pb-2">
 <div id="songSections" class="space-y-6 mb-4"></div>
-<button onclick="window.addSection()" class="w-full mb-2 py-3 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-bold tracking-widest rounded-xl transition-all border border-white/5 active:scale-95">+ ADD SECTION</button>
+<button onclick="window.addSection()" class="w-full mb-2 py-3 btn-5d text-indigo-300 hover:text-white text-xs font-bold tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg> ADD SECTION</button>
 </div>
 
-<div class="flex-shrink-0 pt-4 mt-2 border-t border-white/5">
-<button id="saveSongBtn" onclick="window.submitForm()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-955/20 active:scale-95 transition-all">SAVE SONG SHEET</button>
+<div class="flex-shrink-0 pt-4 mt-2 border-t border-indigo-500/20">
+<button id="saveSongBtn" onclick="window.submitForm()" class="w-full btn-5d-primary py-3.5 rounded-xl text-white font-bold tracking-wider shadow-lg active:scale-95 transition-all">SAVE SONG SHEET</button>
 </div>
 </div>
 </div>
 
 <!-- Global Loading Overlay -->
-<div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] hidden flex-col items-center justify-center transition-opacity">
-    <div class="w-12 h-12 border-4 border-white/10 border-t-indigo-500 rounded-full animate-spin shadow-lg"></div>
-    <div class="mt-4 text-indigo-400 text-xs font-bold tracking-widest uppercase animate-pulse">Processing...</div>
+<div id="loadingOverlay" class="fixed inset-0 bg-[#07080e]/90 backdrop-blur-xl z-[300] hidden flex-col items-center justify-center transition-opacity duration-300">
+    <div class="relative flex items-center justify-center w-28 h-28">
+        <!-- Glowing Core Aura -->
+        <div class="absolute inset-0 bg-indigo-500/20 blur-[40px] rounded-full"></div>
+        
+        <!-- 5D Sonar Ripples -->
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        
+        <!-- Floating 5D Music Note -->
+        <svg class="w-16 h-16 animate-music-float relative z-10 drop-shadow-[0_10px_25px_rgba(99,102,241,0.7)]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="load-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#818cf8" />
+                    <stop offset="100%" stop-color="#312e81" />
+                </linearGradient>
+                <linearGradient id="load-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7" />
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+            <rect x="10" y="10" width="100" height="100" rx="30" fill="url(#load-grad1)" />
+            <rect x="10" y="10" width="100" height="100" rx="30" fill="url(#load-shine)" opacity="0.6" />
+            <path d="M45 80 v-40 l35 -10 v40" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.5))" />
+            <circle cx="35" cy="80" r="12" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.5))" />
+            <circle cx="70" cy="70" r="12" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.5))" />
+        </svg>
+    </div>
+    <div class="mt-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-sky-300 text-[11px] font-extrabold tracking-[0.3em] uppercase animate-pulse drop-shadow-lg">Loading Catalog...</div>
 </div>
 
 <!-- Premium Toast Container -->
-<div id="toastContainer" class="fixed bottom-6 right-6 z-[400] flex flex-col gap-2 pointer-events-none"></div>
+<div id="toastContainer" class="fixed bottom-6 right-4 sm:right-6 z-[400] flex flex-col gap-2 pointer-events-none w-full max-w-[90vw] sm:max-w-xs"></div>
 
-<!-- Back to Top Floating Button -->
-<button id="scrollTopBtn" onclick="window.scrollToTop()" class="fixed bottom-6 left-6 z-50 p-3 bg-indigo-600/80 hover:bg-indigo-500 backdrop-blur-md text-white rounded-full shadow-lg transition-all duration-300 opacity-0 scale-75 pointer-events-none active:scale-95 border border-indigo-400/30">
+<!-- Back to Top Floating Button (Targets full page scroll) -->
+<button id="scrollTopBtn" onclick="window.scrollToTop()" class="fixed bottom-6 left-4 sm:left-6 z-50 p-3 btn-5d-primary text-white rounded-full transition-all duration-300 opacity-0 scale-75 pointer-events-none">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
 </button>
 
 <!-- Main App Workspace -->
-<header id="stageHeader" class="sticky top-0 bg-[#0f111a]/70 backdrop-blur-2xl p-4 z-50 flex items-center justify-between shadow-md border-b border-white/5 transition-all duration-150">
-<div class="flex items-center gap-4">
-<button onclick="window.toggleNav(true)" class="p-2.5 bg-white/5 hover:bg-white/10 active:scale-95 rounded-xl text-indigo-400 font-bold text-xs transition-all flex items-center gap-2 shadow-sm border border-white/5">
+<header id="stageHeader" class="sticky top-0 bg-[#0f111a]/80 backdrop-blur-xl py-2 px-3 sm:px-4 z-[80] flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5 transition-all duration-150">
+<div class="flex items-center gap-2 sm:gap-3">
+<button onclick="window.toggleNav(true)" class="p-1.5 sm:p-2 btn-5d rounded-lg text-indigo-400 font-bold text-xs flex items-center gap-1.5">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-    MENU
+    <span class="hidden sm:inline drop-shadow-md">MENU</span>
 </button>
-<h1 id="pageTitle" class="text-base font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-white select-none">Worship Chordbook</h1>
+<button onclick="window.goHome()" class="p-1.5 sm:p-2 btn-5d rounded-lg text-emerald-400 font-bold text-xs flex items-center justify-center" title="Home Dashboard">
+    <svg class="w-4 h-4 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+</button>
+<h1 class="text-sm sm:text-base font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-white select-none truncate max-w-[160px] sm:max-w-none">Worship Chordbook</h1>
 </div>
-<div class="flex items-center gap-2">
-    <button onclick="window.toggleFullScreen()" class="p-2.5 bg-white/5 hover:bg-white/10 active:scale-95 rounded-xl text-gray-400 hover:text-white transition-all border border-white/5 shadow-sm hidden sm:flex items-center justify-center" title="Toggle Fullscreen">
+<div class="flex items-center gap-1.5">
+    <button onclick="window.toggleFullScreen()" class="p-1.5 sm:p-2 btn-5d rounded-lg text-gray-400 hover:text-white hidden sm:flex items-center justify-center" title="Toggle Fullscreen">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
     </button>
-    <button onclick="window.openShortcutsModal()" class="p-2.5 bg-white/5 hover:bg-white/10 active:scale-95 rounded-xl text-gray-400 hover:text-white transition-all border border-white/5 shadow-sm" title="Keyboard Shortcuts">
+    <button onclick="window.openShortcutsModal()" class="hidden sm:block p-1.5 sm:p-2 btn-5d rounded-lg text-gray-400 hover:text-white" title="Keyboard Shortcuts">
         ⌨
     </button>
-    <button id="adminStatusBtn" onclick="window.toggleAdmin()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-widest transition-all border border-white/5 shadow-sm active:scale-95">
+    <button id="adminStatusBtn" onclick="window.toggleAdmin()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 btn-5d rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">
         <span id="adminStatusIcon" class="text-xs">🔒</span>
-        <span id="adminStatusText">View Only</span>
+        <span id="adminStatusText" class="hidden sm:inline drop-shadow-md">View Only</span>
     </button>
 </div>
 </header>
 
-<main id="appView" class="max-w-5xl mx-auto p-5 pb-32">
+<main id="appView" class="max-w-5xl mx-auto p-2 sm:p-3 md:p-4 pb-32">
 <div class="text-center mt-32 text-gray-500/70 text-sm tracking-wider flex flex-col items-center gap-4 animate-pulse select-none">
     <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-    Select a worship song from the menu...
+    Loading Library...
 </div>
 </main>
 
@@ -333,8 +565,10 @@ var currentKey = 'C';
 var displayMode = 'both';
 var songLines = [];
 var lyricZoom = 1.0;
-var scrollInterval = null;
+var scrollAnimationId = null;
 var scrollSpeed = 3;
+var lastFrameTime = 0;
+var exactScrollY = 0;
 
 var metronomeInterval = null;
 var bpm = 120;
@@ -347,16 +581,20 @@ var originalRoadmap = [];
 var arrangerOpen = false;
 var editingBlockId = null;
 
-var controlsExpanded = true;
+var controlsExpanded = false; 
 var syncedSheetArrangements = [];
 
 var appUser = ""; 
 var appSecret = ""; 
 var editingSongId = null;
 var sections = [];
+var sectionOpenStates = {}; // Tracks which song sections are collapsed
 
 // API Tracker for Wake Lock
 var wakeLock = null;
+
+// Drag and Drop Tracker
+var draggedBlockIndex = null;
 
 const NOTES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 const SCALE_NUMBERS = ['1', '2', '2', '3', '3', '4', '4', '5', '6', '6', '7', '7'];
@@ -381,7 +619,7 @@ const GUITAR_DIAGRAMS = {
 var CHORD_REGEX = /(^|[\s/()|-])([A-G][#b]?)/gi;
 
 // ==========================================
-// QoL PERFORMANCE UTILITIES (New Enhancements)
+// QoL PERFORMANCE UTILITIES (Mobile Fit Enhancements)
 // ==========================================
 window.toggleFullScreen = function() {
     if (!document.fullscreenElement) {
@@ -408,7 +646,6 @@ window.requestWakeLock = async function() {
     }
 }
 
-// Re-request wake lock if the app comes back from being minimized
 document.addEventListener('visibilitychange', async () => {
     if (wakeLock !== null && document.visibilityState === 'visible') {
         window.requestWakeLock();
@@ -424,27 +661,20 @@ window.clearSearch = function() {
 }
 
 window.scrollToTop = function() {
-    const scrollContainer = document.querySelector('.song-scroll-container');
-    if (scrollContainer) {
-        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Function to handle scroll events and toggle the floating button
-window.setupScrollListener = function() {
-    const scrollContainer = document.querySelector('.song-scroll-container');
+// Global scroll listener for back-to-top floating button
+window.addEventListener('scroll', function() {
     const scrollBtn = document.getElementById('scrollTopBtn');
-    
-    if (scrollContainer && scrollBtn) {
-        scrollContainer.addEventListener('scroll', (e) => {
-            if (e.target.scrollTop > 300) {
-                scrollBtn.classList.remove('opacity-0', 'scale-75', 'pointer-events-none');
-            } else {
-                scrollBtn.classList.add('opacity-0', 'scale-75', 'pointer-events-none');
-            }
-        });
+    if (scrollBtn) {
+        if (window.scrollY > 300) {
+            scrollBtn.classList.remove('opacity-0', 'scale-75', 'pointer-events-none');
+        } else {
+            scrollBtn.classList.add('opacity-0', 'scale-75', 'pointer-events-none');
+        }
     }
-}
+});
 
 // ==========================================
 // UTILITY FUNCTIONS
@@ -453,17 +683,17 @@ window.showToast = function(msg, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
     const toast = document.createElement('div');
-    toast.className = `p-4 rounded-2xl backdrop-blur-xl shadow-2xl text-xs font-semibold tracking-wide border transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto flex items-center gap-2 max-w-sm`;
+    toast.className = `p-4 rounded-2xl backdrop-blur-xl shadow-2xl text-xs font-semibold tracking-wide border transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto flex items-center gap-2 w-full`;
     
     if (type === 'success') {
         toast.className += ' bg-emerald-500/10 text-emerald-300 border-emerald-500/20';
-        toast.innerHTML = `<span class="text-base text-emerald-400">✓</span> <span>${msg}</span>`;
+        toast.innerHTML = `<span class="text-base text-emerald-400 flex-shrink-0">✓</span> <span>${msg}</span>`;
     } else if (type === 'error') {
         toast.className += ' bg-rose-500/10 text-rose-300 border-rose-500/20';
-        toast.innerHTML = `<span class="text-base text-rose-400">✕</span> <span>${msg}</span>`;
+        toast.innerHTML = `<span class="text-base text-rose-400 flex-shrink-0">✕</span> <span>${msg}</span>`;
     } else {
         toast.className += ' bg-indigo-500/10 text-indigo-300 border-indigo-500/20';
-        toast.innerHTML = `<span class="text-base text-indigo-400">ℹ</span> <span>${msg}</span>`;
+        toast.innerHTML = `<span class="text-base text-indigo-400 flex-shrink-0">ℹ</span> <span>${msg}</span>`;
     }
     
     container.appendChild(toast);
@@ -500,13 +730,13 @@ window.getFamilyChordsHTML = function(keyStr) {
         ? ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] 
         : ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-    let familyHTML = '<div class="text-[10px] text-indigo-300 mt-2 font-mono flex flex-wrap gap-2 items-center"><span class="text-gray-500 mr-1 uppercase tracking-widest select-none">Family Chords:</span>';
+    let familyHTML = '<div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"><span class="text-[9px] text-indigo-400 uppercase tracking-widest font-extrabold flex-shrink-0 select-none">Family Chords:</span><div class="flex flex-wrap gap-1.5 font-mono">';
     for (let i=0; i<7; i++) {
         const noteIdx = (idx + intervals[i]) % 12;
         const rawChord = `${scaleNotes[noteIdx]}${qualities[i]}`;
-        familyHTML += `<span class="bg-indigo-500/10 border border-white/5 backdrop-blur-sm px-2 py-1 rounded-lg text-indigo-100 shadow-sm transition-all hover:bg-indigo-500/20 hover:scale-105 active:scale-95 cursor-help" onclick="window.showChordTooltip(event, '${rawChord}')"><b>${degrees[i]}</b>: ${scaleNotes[noteIdx]}${qualities[i]}</span>`;
+        familyHTML += `<span class="bg-indigo-500/15 border border-indigo-500/20 backdrop-blur-sm px-2 py-1 rounded-lg text-indigo-50 font-bold shadow-sm transition-all hover:bg-indigo-500/30 hover:scale-105 active:scale-95 cursor-help text-[10px]" onclick="window.showChordTooltip(event, '${rawChord}')"><span class="text-indigo-400/80 mr-1">${degrees[i]}</span>${scaleNotes[noteIdx]}${qualities[i]}</span>`;
     }
-    familyHTML += '</div>';
+    familyHTML += '</div></div>';
     return familyHTML;
 }
 
@@ -743,23 +973,24 @@ window.renderFormSections = function() {
     const container = document.getElementById('songSections');
     if(!container) return;
     container.innerHTML = sections.map((sec, sIdx) => `
-    <div class="bg-black/30 backdrop-blur-sm p-4 md:p-5 rounded-3xl shadow-inner border border-white/5 mb-4">
-    <input type="text" placeholder="Section Name (e.g. Chorus)" class="section-name-input w-full bg-black/40 p-2.5 mb-2 rounded-xl outline-none focus:ring-1 focus:ring-indigo-500/30 text-sm text-white shadow-inner border border-white/5 transition-colors" value="${sec.name}" oninput="window.validateFormSectionNames(this, ${sIdx})" onchange="window.validateFormSectionNames(this, ${sIdx})">
+    <div class="bg-indigo-900/20 p-4 md:p-5 rounded-3xl shadow-[inset_0_0_20px_rgba(99,102,241,0.05)] border border-indigo-500/30 mb-4 transition-all">
+    <input type="text" placeholder="Section Name (e.g. Chorus)" class="section-name-input w-full bg-indigo-900/40 p-3 mb-2 rounded-xl outline-none focus:ring-2 focus:ring-indigo-400/60 text-sm text-white shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 border border-indigo-500/30 transition-colors" value="${sec.name}" oninput="window.validateFormSectionNames(this, ${sIdx})" onchange="window.validateFormSectionNames(this, ${sIdx})">
     <div id="sec-name-warn-${sIdx}" class="text-[10px] text-rose-400 mt-1 mb-2 hidden"></div>
     <p class="text-[10px] text-indigo-300/70 mb-3 italic select-none">Note: Press space after each chord. Tip: Type numbers (1-7) to instantly generate perfect family chords!</p>
     ${sec.lines.map((l, lIdx) => `
-    <div class="flex flex-col gap-1.5 mb-2.5 bg-white/5 p-2.5 rounded-2xl border border-white/5 shadow-sm">
-    <input type="text" placeholder="Chords (e.g. A B)" class="w-full bg-black/40 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-amber-500/30 text-xs text-amber-400 font-mono shadow-inner border border-white/5 transition-colors" value="${l.chords}" oninput="window.formatChordsInput(this); window.validateKeyConsistency();" onchange="window.formatChordsInput(this, true); sections[${sIdx}].lines[${lIdx}].chords=this.value; window.validateKeyConsistency();">
-    <input type="text" placeholder="Lyrics" class="w-full bg-black/40 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-indigo-500/30 text-xs text-gray-200 shadow-inner border border-white/5 transition-colors" value="${l.lyrics}" onchange="sections[${sIdx}].lines[${lIdx}].lyrics=this.value">
+    <div class="flex flex-col gap-1.5 mb-2.5 bg-indigo-950/40 p-2.5 rounded-2xl border border-indigo-500/20 shadow-sm">
+    <input type="text" placeholder="Chords (e.g. A B)" class="w-full bg-indigo-900/30 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-amber-500/50 text-xs text-amber-400 font-mono shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-amber-600/40 border border-indigo-500/30 transition-colors" value="${l.chords}" oninput="window.formatChordsInput(this); window.validateKeyConsistency();" onchange="window.formatChordsInput(this, true); sections[${sIdx}].lines[${lIdx}].chords=this.value; window.validateKeyConsistency();">
+    <input type="text" placeholder="Lyrics" class="w-full bg-indigo-900/30 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-400/60 text-xs text-gray-100 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/40 border border-indigo-500/30 transition-colors" value="${l.lyrics}" onchange="sections[${sIdx}].lines[${lIdx}].lyrics=this.value">
     </div>
     `).join('')}
-    <button onclick="window.addLine(${sIdx})" class="text-[10px] bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg text-indigo-300 mt-1 font-bold transition-all active:scale-95 border border-white/5">+ Add Line</button>
+    <button onclick="window.addLine(${sIdx})" class="text-[10px] btn-5d px-3 py-2 rounded-lg text-indigo-300 mt-1 font-bold transition-all active:scale-95 flex items-center gap-1.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg> Add Line</button>
     </div>
     `).join('');
 }
 
+
 // ==========================================
-// CORE APP INITIALIZATION & RENDER
+// DATA FETCHING & LIST RENDERING
 // ==========================================
 window.initApp = async function() {
     window.showLoading();
@@ -781,6 +1012,7 @@ window.initApp = async function() {
         
         window.renderList();
         window.requestWakeLock(); // Request wake lock on load
+        window.goHome(); // Load the interactive dashboard
     } catch(e) { 
         console.error(e);
         const sc = document.getElementById('sideContent');
@@ -915,17 +1147,146 @@ window.initializeRoadmap = async function() {
     await window.syncPresetsFromGoogleSheet();
 }
 
+window.goHome = function() {
+    currentSong = null;
+    if (scrollAnimationId) window.toggleAutoScroll();
+    if (metronomeActive) window.toggleMetronome();
+
+    const appView = document.getElementById('appView');
+    if (appView) {
+        appView.innerHTML = `
+        <div class="p-6 md:p-10 bg-indigo-950/10 backdrop-blur-xl rounded-2xl sm:rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-indigo-500/20 transition-all overflow-hidden relative">
+            
+            <div class="flex items-center gap-4 sm:gap-6 mb-2 animate-blur-fade opacity-0 relative z-10">
+                <div class="flex-shrink-0">
+                    <!-- 5D Music Note Icon -->
+                    <svg class="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_10px_20px_rgba(99,102,241,0.5)]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="music-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#818cf8" />
+                                <stop offset="100%" stop-color="#312e81" />
+                            </linearGradient>
+                            <linearGradient id="music-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6" />
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="10" y="10" width="100" height="100" rx="30" fill="url(#music-grad1)" />
+                        <rect x="10" y="10" width="100" height="100" rx="30" fill="url(#music-shine)" opacity="0.5" />
+                        <path d="M45 80 v-40 l35 -10 v40" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.4))" />
+                        <circle cx="35" cy="80" r="12" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.4))" />
+                        <circle cx="70" cy="70" r="12" fill="#ffffff" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.4))" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white select-none leading-tight">
+                    Welcome to <br class="hidden sm:block"/><span class="text-shimmer drop-shadow-[0_2px_10px_rgba(139,92,246,0.3)]">Worship Chordbook</span>
+                </h2>
+            </div>
+            
+            <p class="text-sm sm:text-lg text-indigo-200/80 mb-10 max-w-2xl font-medium mt-4 select-none animate-blur-fade delay-100 opacity-0 relative z-10">Your intelligent, stage-ready digital music stand. Select a song from the library to begin playing, or jump straight into your curated sets below.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-8 animate-blur-fade delay-200 opacity-0 relative z-10">
+                <!-- Dashboard Card 1 -->
+                <div onclick="window.toggleNav(true); window.setTab('songs');" class="group cursor-pointer bg-gradient-to-br from-black/40 to-indigo-950/40 hover:from-indigo-900/40 hover:to-blue-900/40 p-8 rounded-[2rem] border border-white/5 hover:border-sky-500/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_40px_rgba(56,189,248,0.2)] active:scale-95 flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <!-- 5D Catalog SVG -->
+                    <svg class="w-20 h-20 mb-5 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 drop-shadow-[0_15px_25px_rgba(56,189,248,0.4)] relative z-10" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="cat-grad1" x1="20%" y1="0%" x2="80%" y2="100%">
+                                <stop offset="0%" stop-color="#38bdf8" />
+                                <stop offset="100%" stop-color="#312e81" />
+                            </linearGradient>
+                            <linearGradient id="cat-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#7dd3fc" />
+                                <stop offset="100%" stop-color="#0284c7" />
+                            </linearGradient>
+                            <linearGradient id="cat-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6" />
+                                <stop offset="50%" stop-color="#ffffff" stop-opacity="0.1" />
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="25" y="25" width="60" height="75" rx="12" fill="url(#cat-grad1)" />
+                        <rect x="35" y="15" width="60" height="75" rx="12" fill="url(#cat-grad2)" />
+                        <rect x="35" y="15" width="60" height="75" rx="12" fill="url(#cat-shine)" />
+                        <path d="M50 40h30M50 55h20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.4))"/>
+                    </svg>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wide relative z-10">Browse Catalog</h3>
+                    <p class="text-sm text-sky-300/80 font-mono relative z-10">${songs.length} total songs</p>
+                </div>
+                
+                <!-- Dashboard Card 2 -->
+                <div onclick="window.toggleNav(true); window.setTab('setlists');" class="group cursor-pointer bg-gradient-to-br from-black/40 to-indigo-950/40 hover:from-purple-900/40 hover:to-fuchsia-900/40 p-8 rounded-[2rem] border border-white/5 hover:border-fuchsia-500/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_40px_rgba(192,132,252,0.2)] active:scale-95 flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-fuchsia-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <!-- 5D Setlist SVG -->
+                    <svg class="w-20 h-20 mb-5 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 drop-shadow-[0_15px_25px_rgba(192,132,252,0.4)] relative z-10" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="set-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#4c1d95" />
+                                <stop offset="100%" stop-color="#1e1b4b" />
+                            </linearGradient>
+                            <linearGradient id="set-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#e879f9" />
+                                <stop offset="100%" stop-color="#9333ea" />
+                            </linearGradient>
+                            <linearGradient id="set-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="20" y="20" width="80" height="80" rx="25" fill="url(#set-grad1)" />
+                        <path d="M65 15 L35 60 h25 L45 105 L90 50 H65 L80 15 Z" fill="url(#set-grad2)" filter="drop-shadow(0 5px 15px rgba(0,0,0,0.5))" />
+                        <path d="M65 15 L35 60 h25 L45 105 L90 50 H65 L80 15 Z" fill="url(#set-shine)" />
+                    </svg>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wide relative z-10">Live Setlist</h3>
+                    <p class="text-sm text-fuchsia-300/80 font-mono relative z-10">${setlists.length} songs queued</p>
+                </div>
+                
+                <!-- Dashboard Card 3 -->
+                <div onclick="window.toggleNav(true); window.setTab('favorites');" class="group cursor-pointer bg-gradient-to-br from-black/40 to-indigo-950/40 hover:from-amber-900/40 hover:to-orange-900/40 p-8 rounded-[2rem] border border-white/5 hover:border-amber-500/50 transition-all duration-500 shadow-2xl hover:shadow-[0_20px_40px_rgba(251,191,36,0.2)] active:scale-95 flex flex-col items-center text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <!-- 5D Fav SVG -->
+                    <svg class="w-20 h-20 mb-5 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 drop-shadow-[0_15px_25px_rgba(251,191,36,0.4)] relative z-10" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="fav-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#78350f" />
+                                <stop offset="100%" stop-color="#451a03" />
+                            </linearGradient>
+                            <linearGradient id="fav-grad2" x1="0%" y1="10%" x2="100%" y2="90%">
+                                <stop offset="0%" stop-color="#fef08a" />
+                                <stop offset="100%" stop-color="#ea580c" />
+                            </linearGradient>
+                            <linearGradient id="fav-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+                                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                            </linearGradient>
+                            <radialGradient id="fav-glow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#fef08a" stop-opacity="1" />
+                                <stop offset="100%" stop-color="#fef08a" stop-opacity="0" />
+                            </radialGradient>
+                        </defs>
+                        <rect x="20" y="20" width="80" height="80" rx="40" fill="url(#fav-grad1)" />
+                        <path d="M60 20 l12 28 h30 l-24 18 9 29 -27 -18 -27 18 9 -29 -24 -18 h30 z" fill="url(#fav-grad2)" filter="drop-shadow(0 10px 15px rgba(0,0,0,0.5))" />
+                        <path d="M60 20 l12 28 h30 l-24 18 9 29 -27 -18 -27 18 9 -29 -24 -18 h30 z" fill="url(#fav-shine)" />
+                        <circle cx="60" cy="55" r="15" fill="url(#fav-glow)" opacity="0.6" mix-blend-mode="screen" />
+                    </svg>
+                    <h3 class="text-white font-bold text-xl mb-1 tracking-wide relative z-10">Favorites</h3>
+                    <p class="text-sm text-amber-300/80 font-mono relative z-10">${favorites.length} starred charts</p>
+                </div>
+            </div>
+        </div>`;
+    }
+}
+
 window.changeSong = async function(song) {
     try {
         currentSong = song;
         currentKey = song.OriginalKey || 'C';
+        controlsExpanded = false; 
         window.toggleNav(false);
         
-        const titleEl = document.getElementById('pageTitle');
-        if (titleEl) titleEl.innerText = song.Title || 'Unknown Song';
-
         window.showLoading();
-        window.requestWakeLock(); // ensure screen stays alive when picking a song
+        window.requestWakeLock(); 
         
         const res = await fetch(`${SCRIPT_URL}?tab=SongLines`);
         const textData = await res.text();
@@ -947,7 +1308,7 @@ window.changeSong = async function(song) {
 
         songLines = allLines.filter(line => line && String(line.SongID) === String(song.SongID));
         
-        if (scrollInterval) window.toggleAutoScroll();
+        if (scrollAnimationId) window.toggleAutoScroll();
         if (metronomeActive) window.toggleMetronome();
         
         await window.initializeRoadmap();
@@ -1081,7 +1442,11 @@ window.showChordTooltip = function(event, chordName) {
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-        tooltip.style.left = `${rect.left + scrollLeft - 60}px`;
+        let targetLeft = rect.left + scrollLeft - 60;
+        if (targetLeft < 10) targetLeft = 10;
+        if (targetLeft + 180 > window.innerWidth) targetLeft = window.innerWidth - 190;
+        
+        tooltip.style.left = `${targetLeft}px`;
         tooltip.style.top = `${rect.top + scrollTop - 165}px`;
         tooltip.classList.remove('hidden');
     }
@@ -1111,15 +1476,49 @@ window.scrollToSection = function(id) {
     }
 }
 
+window.toggleSection = function(idx) {
+    sectionOpenStates[idx] = sectionOpenStates[idx] === false ? true : false;
+    const content = document.getElementById(`sec-content-${idx}`);
+    const chevron = document.getElementById(`chevron-${idx}`);
+    if (content) {
+        if (sectionOpenStates[idx] === false) {
+            content.classList.remove('is-open');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        } else {
+            content.classList.add('is-open');
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        }
+    }
+}
+
 window.toggleArranger = function() {
     arrangerOpen = !arrangerOpen;
-    editingBlockId = null;
-    window.renderSong();
+    const panel = document.getElementById('arrangerPanelWrapper');
+    if (panel) {
+        if (arrangerOpen) {
+            panel.classList.add('is-open');
+        } else {
+            panel.classList.remove('is-open');
+            editingBlockId = null;
+            // Silently fully re-render after the animation closes to clear dissector out of DOM
+            setTimeout(() => { window.renderSong(); }, 600); 
+        }
+    }
 }
 
 window.toggleControlPanel = function() {
     controlsExpanded = !controlsExpanded;
-    window.renderSong();
+    const controls = document.getElementById('collapsibleControls');
+    const btn = document.getElementById('controlsToggleBtn');
+    if (controls) {
+        if (controlsExpanded) {
+            controls.classList.add('is-open');
+            if (btn) btn.innerHTML = '<span>▲</span> Hide Tools';
+        } else {
+            controls.classList.remove('is-open');
+            if (btn) btn.innerHTML = '<span>▼</span> Show Tools';
+        }
+    }
 }
 
 window.shiftRoadmap = function(index, direction) {
@@ -1130,6 +1529,49 @@ window.shiftRoadmap = function(index, direction) {
     window.renderSong();
     window.showToast("Arrangement sequence updated!", "success");
 }
+
+// --- Drag & Drop Roadmap Engine ---
+window.handleDragStart = function(e, idx) {
+    draggedBlockIndex = idx;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => {
+        e.target.classList.add('opacity-40', 'border-dashed', 'scale-95');
+    }, 10);
+};
+
+window.handleDragOver = function(e) {
+    e.preventDefault(); // Necessary to allow dropping
+};
+
+window.handleDragEnter = function(e) {
+    e.preventDefault();
+    let target = e.currentTarget;
+    target.classList.add('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
+};
+
+window.handleDragLeave = function(e) {
+    let target = e.currentTarget;
+    target.classList.remove('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
+};
+
+window.handleDrop = function(e, targetIndex) {
+    e.stopPropagation();
+    e.currentTarget.classList.remove('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
+    
+    if (draggedBlockIndex !== null && draggedBlockIndex !== targetIndex) {
+        const item = activeRoadmap.splice(draggedBlockIndex, 1)[0];
+        activeRoadmap.splice(targetIndex, 0, item);
+        window.renderSong();
+        window.showToast("Roadmap reordered!", "success");
+    }
+    return false;
+};
+
+window.handleDragEnd = function(e) {
+    e.target.classList.remove('opacity-40', 'border-dashed', 'scale-95');
+    draggedBlockIndex = null;
+};
+// ----------------------------------
 
 window.deleteRoadmap = function(index) {
     if (activeRoadmap.length <= 1) {
@@ -1331,7 +1773,7 @@ window.renderPresetsListUI = function() {
     const presetsOptions = Object.keys(savedPresets).map(name => `
         <div class="flex items-center justify-between p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-[10px]">
             <button onclick="window.loadPreset('${name.replace(/'/g, "\\'")}')" class="flex-1 text-left font-bold text-gray-300 hover:text-white uppercase truncate pr-2">${name}</button>
-            <button onclick="window.deletePreset('${name.replace(/'/g, "\\'")}')" class="text-rose-400/60 hover:text-rose-400 px-1 font-bold text-[9px]">✕</button>
+            <button onclick="window.deletePreset('${name.replace(/'/g, "\\'")}')" class="text-rose-400/60 hover:text-rose-400 px-2.5 py-1 font-bold text-xs">✕</button>
         </div>
     `).join('');
     
@@ -1375,7 +1817,7 @@ window.triggerAutoscrollCapability = function() {
         return;
     }
     window.toggleAutoScroll();
-    window.showToast(scrollInterval ? "Autoscrolling Song Sheet!" : "Autoscroll Paused", scrollInterval ? "success" : "info");
+    window.showToast(scrollAnimationId ? "Autoscrolling Song Sheet!" : "Autoscroll Paused", scrollAnimationId ? "success" : "info");
 }
 
 window.adjustZoom = function(amount) {
@@ -1394,14 +1836,13 @@ window.shiftKey = function(direction) {
 }
 
 window.toggleAutoScroll = function() {
-    const container = document.querySelector('.song-scroll-container');
     const text = document.getElementById('scrollBtnText');
     const icon = document.getElementById('scrollIcon');
     const btn = document.getElementById('autoScrollBtn');
 
-    if (scrollInterval) {
-        clearInterval(scrollInterval);
-        scrollInterval = null;
+    if (scrollAnimationId) {
+        cancelAnimationFrame(scrollAnimationId);
+        scrollAnimationId = null;
         if (text) text.innerText = "Auto Scroll";
         if (btn) {
             btn.classList.remove('bg-emerald-500/20', 'text-emerald-300');
@@ -1416,19 +1857,64 @@ window.toggleAutoScroll = function() {
         if (text) text.innerText = "Playing";
         if (icon) icon.innerHTML = `<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>`;
         
-        scrollInterval = setInterval(() => {
-            if (container) {
-                container.scrollTop += (scrollSpeed / 5);
-                if (container.scrollTop >= (container.scrollHeight - container.clientHeight)) {
-                    window.toggleAutoScroll();
-                }
+        lastFrameTime = performance.now();
+        const scrollContainer = document.querySelector('.song-scroll-container');
+        exactScrollY = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+        let expectedScrollY = exactScrollY;
+        
+        function step(currentTime) {
+            if (!scrollAnimationId) return;
+            
+            const deltaTime = currentTime - lastFrameTime;
+            // Cap delta time to 50ms to prevent massive jumps if tab is inactive
+            const cappedDelta = Math.min(deltaTime, 50); 
+            lastFrameTime = currentTime;
+            
+            const container = document.querySelector('.song-scroll-container');
+            const targetEl = container || window;
+            const currentScroll = container ? container.scrollTop : window.scrollY;
+
+            // Smart user-scroll detection: 
+            // If current scroll position drifted from our last programmatic scroll by more than 2px,
+            // it means the user manually swiped the internal panel. Re-sync our exact tracker.
+            if (Math.abs(currentScroll - expectedScrollY) > 2) {
+                exactScrollY = currentScroll;
             }
-        }, 30);
+            
+            // Calculate fluid sub-pixel scroll amount based on exact delta time
+            const pixelsPerSecond = scrollSpeed * 12; 
+            const pixelsToScroll = (pixelsPerSecond * cappedDelta) / 1000;
+            
+            exactScrollY += pixelsToScroll;
+            
+            // Force instant scroll to prevent browser smoothing conflicts
+            targetEl.scrollTo({
+                top: exactScrollY,
+                left: 0,
+                behavior: 'instant'
+            });
+            
+            expectedScrollY = container ? container.scrollTop : window.scrollY;
+            
+            const maxScroll = container 
+                ? container.scrollHeight - container.clientHeight 
+                : document.body.offsetHeight - window.innerHeight;
+
+            // Stop at the bottom of the container
+            if (Math.ceil(currentScroll) >= maxScroll - 2) {
+                window.toggleAutoScroll();
+                return;
+            }
+            
+            scrollAnimationId = requestAnimationFrame(step);
+        }
+        
+        scrollAnimationId = requestAnimationFrame(step);
     }
 }
 
 window.adjustScrollSpeed = function(val) {
-    scrollSpeed = parseInt(val);
+    scrollSpeed = parseFloat(val);
 }
 
 window.toggleMetronome = function() {
@@ -1495,10 +1981,8 @@ window.stopMetronome = function() {
 window.updateBpm = function(val) {
     bpm = Math.max(40, Math.min(250, parseInt(val) || 120));
     
-    // Auto-sync scroll speed to BPM
-    // Map 40-250 BPM into a 1-10 scroll speed smoothly
-    let suggestedSpeed = Math.round(bpm / 25); 
-    suggestedSpeed = Math.max(1, Math.min(10, suggestedSpeed));
+    let suggestedSpeed = bpm / 25; 
+    suggestedSpeed = Math.max(0.1, Math.min(20, suggestedSpeed));
     scrollSpeed = suggestedSpeed;
     
     const speedSlider = document.getElementById('scrollSpeedSlider');
@@ -1560,9 +2044,9 @@ window.setTab = function(tab) {
         const el = document.getElementById(b);
         if(!el) return;
         if (b === `tab-${tab}`) {
-            el.className = "text-[9px] font-bold py-2 bg-white/10 rounded-xl transition-all hover:bg-white/15 active:scale-95 text-white border border-white/5";
+            el.className = "text-[9px] font-bold py-2 bg-indigo-600/40 rounded-xl transition-all hover:bg-indigo-500/50 active:scale-95 text-white border border-indigo-400/50 shadow-md";
         } else {
-            el.className = "text-[9px] font-bold py-2 hover:bg-white/5 rounded-xl transition-all hover:bg-white/10 active:scale-95 text-gray-400 hover:text-white";
+            el.className = "text-[9px] font-bold py-2 bg-indigo-950/20 hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 text-indigo-300/60 hover:text-indigo-200 border border-indigo-500/20";
         }
     });
     
@@ -1590,12 +2074,12 @@ window.updateAdminUI = function() {
     const addBtn = document.getElementById('addBtn');
 
     if (appUser && appSecret) {
-        if(btn) { btn.classList.remove('bg-white/5', 'text-gray-400'); btn.classList.add('bg-indigo-500/20', 'text-indigo-300', 'border-indigo-500/30'); }
+        if(btn) { btn.classList.remove('text-gray-400'); btn.classList.add('text-emerald-400'); }
         if(icon) icon.innerText = '🔓';
         if(text) text.innerText = 'Admin';
         if(addBtn) addBtn.classList.remove('hidden');
     } else {
-        if(btn) { btn.classList.remove('bg-indigo-500/20', 'text-indigo-300', 'border-indigo-500/30'); btn.classList.add('bg-white/5', 'text-gray-400'); }
+        if(btn) { btn.classList.remove('text-emerald-400'); btn.classList.add('text-gray-400'); }
         if(icon) icon.innerText = '🔒';
         if(text) text.innerText = 'View Only';
         if(addBtn) addBtn.classList.add('hidden');
@@ -1788,276 +2272,344 @@ window.submitForm = async function() {
 window.renderSong = function() {
     if (!currentSong) return;
     
-    const currentIdx = NOTE_TO_INDEX[currentKey] || 0;
-    const originalIdx = NOTE_TO_INDEX[currentSong.OriginalKey] || 0;
-    const semitones = currentIdx - originalIdx;
-    const isFav = favorites.includes(String(currentSong.SongID));
-    const inSet = setlists.includes(String(currentSong.SongID));
+    try {
+        const currentIdx = NOTE_TO_INDEX[currentKey] || 0;
+        const originalIdx = NOTE_TO_INDEX[currentSong.OriginalKey] || 0;
+        const semitones = currentIdx - originalIdx;
+        const isFav = favorites.includes(String(currentSong.SongID));
+        const inSet = setlists.includes(String(currentSong.SongID));
 
-    const roadmapHTML = activeRoadmap.map((block, idx) => `
-        <button onclick="window.scrollToSection('sec-${idx}')" class="px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 active:scale-95 border border-indigo-500/20 rounded-xl text-[9px] font-bold uppercase tracking-widest text-indigo-300 transition-all select-none flex items-center gap-1.5">
-            <span class="text-[8px] bg-indigo-500/20 text-indigo-300 rounded px-1">${idx + 1}</span>
-            ${block.name}
-        </button>
-    `).join('');
+        const roadmapHTML = activeRoadmap.map((block, idx) => `
+            <button onclick="window.scrollToSection('sec-${idx}')" class="px-2.5 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/40 active:scale-95 border border-indigo-500/30 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-indigo-100 transition-all select-none flex items-center gap-1.5 shadow-sm">
+                <span class="text-[8px] bg-indigo-500/40 text-white rounded px-1 shadow-inner">${idx + 1}</span>
+                ${block.name}
+            </button>
+        `).join('');
 
-    let blockLineDissectorHTML = '';
-    if (editingBlockId) {
-        const editingBlock = activeRoadmap.find(b => b.id === editingBlockId);
-        if (editingBlock) {
-            const fullLinesList = sectionTemplates[editingBlock.name] || [];
-            blockLineDissectorHTML = `
-            <div class="p-4 bg-indigo-950/10 rounded-2xl border border-indigo-500/20 mt-3 select-none animate-fadeIn">
-                <div class="flex justify-between items-center mb-3 pb-2 border-b border-white/5">
-                    <span class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
-                        <span>✂️ Line Dissector:</span> <b class="text-white">${editingBlock.name}</b>
-                    </span>
-                    <span class="text-[8px] text-gray-500 font-mono">Select specific lines to perform in this block</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    ${fullLinesList.map((line, lIdx) => {
-                        const isEnabled = (editingBlock.enabledLines || []).includes(lIdx);
-                        return `
-                        <div onclick="window.toggleLineInBlock('${editingBlockId}', ${lIdx})" class="flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer ${isEnabled ? 'bg-white/5 border border-indigo-500/30' : 'bg-black/20 border border-transparent opacity-40'} text-[10px] hover:bg-white/10">
-                            <div class="flex items-center gap-3 truncate pr-4">
-                                <span class="font-mono text-gray-500">L${lIdx + 1}</span>
-                                <div class="truncate">
-                                    <span class="text-amber-400/90 font-mono text-[9px] block ${isEnabled ? '' : 'line-through italic'}">${line.Chords || '[No Chords]'}</span>
-                                    <span class="text-gray-200 block truncate ${isEnabled ? '' : 'italic'}">${line.Lyrics || '[Instrumental]'}</span>
+        let blockLineDissectorHTML = '';
+        if (editingBlockId) {
+            const editingBlock = activeRoadmap.find(b => b.id === editingBlockId);
+            if (editingBlock) {
+                const fullLinesList = sectionTemplates[editingBlock.name] || [];
+                blockLineDissectorHTML = `
+                <div class="p-3 bg-indigo-950/10 rounded-xl border border-indigo-500/20 mt-2 select-none animate-fadeIn">
+                    <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-white/5">
+                        <span class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                            <span>✂️ Line Dissector:</span> <b class="text-white">${editingBlock.name}</b>
+                        </span>
+                        <span class="text-[8px] text-gray-500 font-mono">Select specific lines to perform in this block</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${fullLinesList.map((line, lIdx) => {
+                            const isEnabled = (editingBlock.enabledLines || []).includes(lIdx);
+                            return `
+                            <div onclick="window.toggleLineInBlock('${editingBlockId}', ${lIdx})" class="flex items-center justify-between p-2 rounded-lg transition-all cursor-pointer ${isEnabled ? 'bg-white/5 border border-indigo-500/30' : 'bg-black/20 border border-transparent opacity-40'} text-[10px] hover:bg-white/10">
+                                <div class="flex items-center gap-2 truncate pr-2">
+                                    <span class="font-mono text-[9px] text-gray-500">L${lIdx + 1}</span>
+                                    <div class="truncate">
+                                        <span class="text-amber-400/90 font-mono text-[8px] block ${isEnabled ? '' : 'line-through italic'}">${line.Chords || '[No Chords]'}</span>
+                                        <span class="text-gray-200 text-[9px] block truncate ${isEnabled ? '' : 'italic'}">${line.Lyrics || '[Instrumental]'}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                    <span class="text-[7px] font-bold uppercase tracking-wider ${isEnabled ? 'text-indigo-400' : 'text-gray-600'}">${isEnabled ? 'Active' : 'Muted'}</span>
+                                    <div class="w-6 h-3 rounded-full relative transition-colors duration-200 ${isEnabled ? 'bg-indigo-500' : 'bg-white/10'}">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-white absolute top-[1px] transition-all duration-200 ${isEnabled ? 'left-[13px]' : 'left-[1px]'}"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <span class="text-[8px] font-bold uppercase tracking-wider ${isEnabled ? 'text-indigo-400' : 'text-gray-600'}">${isEnabled ? 'Active' : 'Muted'}</span>
-                                <div class="w-8 h-4.5 rounded-full relative transition-colors duration-200 ${isEnabled ? 'bg-indigo-500' : 'bg-white/10'}">
-                                    <div class="w-3.5 h-3.5 rounded-full bg-white absolute top-0.5 transition-all duration-200 ${isEnabled ? 'left-4' : 'left-0.5'}"></div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>`;
+            }
+        }
+
+        const storageStatusHTML = `
+            <span class="text-[7px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded flex-shrink-0 font-bold uppercase tracking-widest font-mono">☁️ Cloud Sync</span>
+        `;
+
+        const arrangerPanelHTML = `
+        <div id="arrangerPanelWrapper" class="panel-wrap ${arrangerOpen ? 'is-open' : ''}">
+            <div class="panel-inner">
+                <div class="pt-2.5">
+                    <div class="mb-2.5 p-3 bg-black/40 rounded-xl border border-indigo-500/20 space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-b border-white/5 pb-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5 select-none">
+                                    <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold">Shared Band Presets</div>
+                                    ${storageStatusHTML}
+                                </div>
+                                <div id="presetsListContainer" class="space-y-1 overflow-y-auto max-h-[80px] pr-1">
+                                    <div class="text-[8px] text-gray-500 italic py-2 text-center">Loading arrangements...</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col justify-between">
+                                <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold mb-1.5 select-none">Save Arrangement</div>
+                                <div class="space-y-1.5">
+                                    <input type="text" id="presetNameInput" placeholder="Preset name (e.g. Standard Acoustic)" class="w-full bg-black/50 p-2 rounded-lg text-[10px] text-white border border-white/5 outline-none focus:ring-1 focus:ring-indigo-500/30">
+                                    <button onclick="window.savePreset()" class="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[9px] font-bold tracking-wider uppercase transition-all active:scale-95">Save Active Flow</button>
                                 </div>
                             </div>
                         </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>`;
-        }
-    }
 
-    const storageStatusHTML = `
-        <span class="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-widest font-mono">☁️ Collaborative Band Sync</span>
-    `;
+                        <div>
+                            <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold mb-1.5 select-none">Configure sequence flow</div>
+                            <div class="flex flex-wrap gap-2 overflow-x-auto pb-4 pt-3 -mt-2 max-h-[160px]">
+                                ${activeRoadmap.map((block, idx) => {
+                                    const blockKey = window.getModulatedKeyName(currentKey, block.keyOffset || 0);
+                                    const modSign = (block.keyOffset || 0) >= 0 ? '+' : '';
+                                    const templateLines = sectionTemplates[block.name] || [];
+                                    
+                                    return `
+                                    <div draggable="true" 
+                                         ondragstart="window.handleDragStart(event, ${idx})" 
+                                         ondragover="window.handleDragOver(event)" 
+                                         ondragenter="window.handleDragEnter(event)" 
+                                         ondragleave="window.handleDragLeave(event)" 
+                                         ondrop="window.handleDrop(event, ${idx})" 
+                                         ondragend="window.handleDragEnd(event)" 
+                                         onclick="window.editBlockLines('${block.id}')" 
+                                         class="flex flex-col items-center border rounded-lg p-2 min-w-[100px] select-none relative group transition-all cursor-grab active:cursor-grabbing ${editingBlockId === block.id ? 'bg-indigo-600/20 border-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.2)] scale-105 z-10' : 'bg-indigo-500/10 border-indigo-500/20 hover:bg-indigo-500/15'} mt-1">
+                                        <span class="text-[8px] text-gray-500 font-mono font-bold absolute top-1.5 left-2">#${idx+1}</span>
+                                        <span class="text-[10px] sm:text-xs font-bold text-indigo-300 uppercase mt-2 mb-1">${block.name}</span>
+                                        <span class="text-[8px] font-mono text-gray-400 mb-2">${(block.enabledLines || []).length}/${templateLines.length} lines</span>
+                                        
+                                        <div class="flex items-center justify-between w-full mt-1 pt-1 border-t border-white/5 select-none" onclick="event.stopPropagation()">
+                                            <span class="text-[8px] text-amber-400 font-mono font-bold" title="Effective Key for this block">${blockKey}</span>
+                                            <div class="flex items-center gap-1">
+                                                <button onclick="window.adjustBlockModulation('${block.id}', -1)" class="w-5 h-5 rounded bg-black/40 hover:bg-white/10 text-xs flex items-center justify-center text-indigo-300 font-bold transition-colors cursor-pointer">-</button>
+                                                <span class="text-[9px] text-indigo-200 font-mono font-bold px-0.5">${modSign}${block.keyOffset || 0}</span>
+                                                <button onclick="window.adjustBlockModulation('${block.id}', 1)" class="w-5 h-5 rounded bg-black/40 hover:bg-white/10 text-xs flex items-center justify-center text-indigo-300 font-bold transition-colors cursor-pointer">+</button>
+                                            </div>
+                                        </div>
 
-    const arrangerPanelHTML = arrangerOpen ? `
-    <div class="mb-4 p-4 bg-black/40 rounded-2xl border border-indigo-500/20 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-white/5 pb-4">
-            <div>
-                <div class="flex items-center justify-between mb-2 select-none">
-                    <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold">Shared Band Presets</div>
-                    ${storageStatusHTML}
-                </div>
-                <div id="presetsListContainer" class="space-y-1.5 overflow-y-auto max-h-[110px] pr-1">
-                    <div class="text-[9px] text-gray-500 italic py-2 md:py-3 text-center">Loading arrangements...</div>
+                                        <div class="flex gap-1.5 mt-2 w-full justify-center">
+                                            <div class="relative arranger-btn">
+                                                <button onclick="window.shiftRoadmap(${idx}, -1); event.stopPropagation()" class="w-6 h-6 rounded bg-black/30 hover:bg-white/10 active:scale-125 text-[10px] flex items-center justify-center transition-all shadow-sm cursor-pointer">◀</button>
+                                                <div class="absolute bottom-full mb-1 left-1/2 arranger-tooltip pointer-events-none z-50 bg-indigo-900 text-indigo-100 text-[9px] px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap border border-indigo-700">Move Left</div>
+                                            </div>
+                                            <div class="relative arranger-btn">
+                                                <button onclick="window.deleteRoadmap(${idx}); event.stopPropagation()" class="w-6 h-6 rounded bg-rose-500/10 hover:bg-rose-500/30 text-rose-400 active:scale-125 text-[10px] flex items-center justify-center transition-all shadow-sm cursor-pointer">✕</button>
+                                                <div class="absolute bottom-full mb-1 left-1/2 arranger-tooltip pointer-events-none z-50 bg-rose-900 text-rose-100 text-[9px] px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap border border-rose-700">Remove</div>
+                                            </div>
+                                            <div class="relative arranger-btn">
+                                                <button onclick="window.shiftRoadmap(${idx}, 1); event.stopPropagation()" class="w-6 h-6 rounded bg-black/30 hover:bg-white/10 active:scale-125 text-[10px] flex items-center justify-center transition-all shadow-sm cursor-pointer">▶</button>
+                                                <div class="absolute bottom-full mb-1 left-1/2 arranger-tooltip pointer-events-none z-50 bg-indigo-900 text-indigo-100 text-[9px] px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap border border-indigo-700">Move Right</div>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        
+                        ${blockLineDissectorHTML}
+
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 select-none">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="text-[8px] text-gray-500 uppercase tracking-widest font-bold">Inject Block:</span>
+                                ${Object.keys(sectionTemplates).map(sec => `
+                                    <button onclick="window.addRoadmap('${sec}')" class="px-2 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded text-[8px] font-bold uppercase tracking-widest text-emerald-300 transition-all active:scale-95">
+                                        + ${sec}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <button onclick="window.resetRoadmap()" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded text-[8px] font-bold uppercase tracking-widest text-rose-300 transition-all active:scale-95">
+                                Reset Default
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col justify-between">
-                <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold mb-2 select-none">Save Arrangement</div>
-                <div class="space-y-2">
-                    <input type="text" id="presetNameInput" placeholder="Preset name (e.g. Standard Acoustic)" class="w-full bg-black/50 p-2.5 rounded-xl text-xs text-white border border-white/5 outline-none focus:ring-1 focus:ring-indigo-500/30">
-                    <button onclick="window.savePreset()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all active:scale-95">Save Active Flow</button>
+        </div>`;
+
+        const collapsibleControlsHTML = `
+        <div id="collapsibleControls" class="panel-wrap ${controlsExpanded ? 'is-open' : ''}">
+            <div class="panel-inner">
+                <div class="pt-3 space-y-3">
+                    
+                    <!-- Unified Ultra-Dense Performance Toolbar (Balanced Full-Width) -->
+                    <div class="flex flex-wrap items-center justify-center lg:justify-between w-full gap-x-3 gap-y-3 p-2.5 sm:px-4 bg-indigo-950/20 rounded-xl border border-indigo-500/20 shadow-sm">
+                        
+                        <!-- Transpose Control -->
+                        <div class="flex items-center gap-1">
+                            <button onclick="window.shiftKey(-1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">-</button>
+                            <span class="w-8 text-center text-[10px] font-bold text-amber-400 font-mono">${currentKey}</span>
+                            <button onclick="window.shiftKey(1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">+</button>
+                        </div>
+                        
+                        <!-- Separator -->
+                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+                        
+                        <!-- Display Mode Select -->
+                        <div class="flex items-center">
+                            <select onchange="displayMode=this.value; window.renderSong()" class="bg-black/30 text-[10px] py-1 px-2.5 rounded-lg text-gray-200 outline-none shadow-inner border border-white/5 transition-all appearance-none cursor-pointer text-center hover:bg-black/50 focus:ring-1 focus:ring-indigo-500/50">
+                                <option value="chords" ${displayMode==='chords'?'selected':''}>Chords Only</option>
+                                <option value="numbers" ${displayMode==='numbers'?'selected':''}>Numbers Only</option>
+                                <option value="both" ${displayMode==='both'?'selected':''}>Chords & Numbers</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Separator -->
+                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+                        
+                        <!-- Zoom Font Size Control -->
+                        <div class="flex items-center gap-1">
+                            <button onclick="window.adjustZoom(-0.1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[10px] text-gray-300 active:scale-95 transition-all">A-</button>
+                            <button onclick="window.adjustZoom(0.1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[10px] text-gray-300 active:scale-95 transition-all">A+</button>
+                        </div>
+
+                        <!-- Separator -->
+                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+
+                        <!-- Autoscroll & Speed -->
+                        <div class="flex items-center gap-2">
+                            <button id="autoScrollBtn" onclick="window.toggleAutoScroll()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm">
+                                <svg id="scrollIcon" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                <span id="scrollBtnText">Scroll</span>
+                            </button>
+                            <div class="relative flex items-center">
+                                <input type="range" id="scrollSpeedSlider" min="0.1" max="20" step="0.01" value="${scrollSpeed}" oninput="window.adjustScrollSpeed(this.value)" class="w-20 sm:w-28 accent-indigo-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Separator -->
+                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+
+                        <!-- Metronome & Tap Tempo -->
+                        <div class="flex items-center gap-1">
+                            <button id="metronomeBtn" onclick="window.toggleMetronome()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-1 active:scale-95 border border-white/5 shadow-sm">
+                                <span id="metronomeDot" class="w-1.5 h-1.5 rounded-full bg-rose-500 opacity-20 scale-90 transition-all duration-100"></span>
+                                Metro
+                            </button>
+                            <button onclick="window.tapTempo()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all active:scale-95 border border-rose-500/20 shadow-sm">
+                                TAP
+                            </button>
+                            <input type="number" id="metronomeBpm" min="40" max="250" value="${bpm}" onchange="window.updateBpm(this.value)" oninput="window.updateBpm(this.value)" class="w-12 bg-black/40 text-center rounded-md p-1 text-[10px] font-mono font-bold text-rose-300 outline-none focus:ring-1 focus:ring-rose-500/30 border border-white/5 shadow-inner">
+                        </div>
+                    </div>
+
+                    <!-- Roadmap Panel -->
+                    <div class="p-2 bg-indigo-900/20 rounded-xl border border-indigo-500/30 shadow-[inset_0_0_20px_rgba(99,102,241,0.05)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
+                            <span class="text-[10px] sm:text-xs text-indigo-300 uppercase tracking-widest font-extrabold flex items-center gap-1.5 select-none whitespace-nowrap px-1">
+                                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                                Live Roadmap:
+                            </span>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                ${roadmapHTML}
+                            </div>
+                        </div>
+                        <button onclick="window.toggleArranger()" class="w-full sm:w-auto px-3 py-1.5 btn-5d-primary text-white text-[9px] font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-1.5 flex-shrink-0 shadow-md">
+                            🗺️ Arrange Flow
+                        </button>
+                    </div>
+
+                    ${arrangerPanelHTML}
+
+                    <div class="pt-1.5 border-t border-indigo-500/20 mt-0.5">
+                        ${window.getFamilyChordsHTML(currentKey)}
+                    </div>
                 </div>
             </div>
         </div>
+        `;
 
-        <div>
-            <div class="text-[9px] text-indigo-400 uppercase tracking-widest font-bold mb-2 select-none">Configure sequence flow</div>
-            <div class="flex flex-wrap gap-2 overflow-x-auto pb-1 max-h-[140px]">
-                ${activeRoadmap.map((block, idx) => {
-                    const blockKey = window.getModulatedKeyName(currentKey, block.keyOffset || 0);
-                    const modSign = (block.keyOffset || 0) >= 0 ? '+' : '';
-                    const templateLines = sectionTemplates[block.name] || [];
-                    
-                    return `
-                    <div onclick="window.editBlockLines('${block.id}')" class="flex flex-col items-center border rounded-xl p-2 min-w-[95px] select-none relative group transition-all cursor-pointer ${editingBlockId === block.id ? 'bg-indigo-600/20 border-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.2)] scale-105' : 'bg-indigo-500/10 border-indigo-500/20 hover:bg-indigo-500/15'}">
-                        <span class="text-[8px] text-gray-500 font-mono font-bold absolute top-1 left-1.5">#${idx+1}</span>
-                        <span class="text-[9px] font-bold text-indigo-300 uppercase mt-2.5 mb-1.5">${block.name}</span>
-                        <span class="text-[8px] font-mono text-gray-400 mb-2">${(block.enabledLines || []).length}/${templateLines.length} lines</span>
+        const appView = document.getElementById('appView');
+        if (appView) {
+            appView.innerHTML = `
+            <div class="p-2.5 sm:p-3 md:p-4 bg-gradient-to-br from-indigo-950/40 via-[#0a0b16]/60 to-[#05060a]/80 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-indigo-500/20 transition-all flex flex-col" style="max-height: calc(100vh - 75px);">
+                <div class="flex-shrink-0">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         
-                        <div class="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-white/5 select-none" onclick="event.stopPropagation()">
-                            <span class="text-[8px] text-amber-400 font-mono font-bold" title="Effective Key for this block">${blockKey}</span>
-                            <div class="flex items-center gap-1">
-                                <button onclick="window.adjustBlockModulation('${block.id}', -1)" class="w-4 h-4 rounded bg-black/40 hover:bg-white/10 text-[7px] flex items-center justify-center text-indigo-300 font-bold">-</button>
-                                <span class="text-[8px] text-indigo-200 font-mono font-bold px-0.5">${modSign}${block.keyOffset || 0}</span>
-                                <button onclick="window.adjustBlockModulation('${block.id}', 1)" class="w-4 h-4 rounded bg-black/40 hover:bg-white/10 text-[7px] flex items-center justify-center text-indigo-300 font-bold">+</button>
+                        <!-- Title, Artist & Star/Setlist Buttons -->
+                        <div class="flex-1 min-w-0 w-full sm:w-auto flex flex-col">
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white select-none leading-tight truncate max-w-full">${currentSong.Title}</h2>
+                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                    <button onclick="window.toggleFav('${currentSong.SongID}')" class="px-2 py-1 rounded-md text-[9px] btn-5d transition-all ${isFav?'text-amber-400 font-bold border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
+                                        ${isFav?'★ Fav':'☆ Fav'}
+                                    </button>
+                                    <button onclick="window.toggleSetlist('${currentSong.SongID}')" class="px-2 py-1 rounded-md text-[9px] btn-5d transition-all ${inSet?'text-violet-400 font-bold border-violet-500/40 shadow-[0_0_10px_rgba(139,92,246,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
+                                        ${inSet?'⚡ Set':'☆ Set'}
+                                    </button>
+                                </div>
                             </div>
+                            <p class="text-[10px] text-indigo-300/80 font-medium select-none truncate mt-0.5">${currentSong.Artist || 'Unknown Artist'}</p>
                         </div>
 
-                        <div class="flex gap-1.5 mt-2.5 w-full justify-center">
-                            <button onclick="window.shiftRoadmap(${idx}, -1); event.stopPropagation()" class="w-5 h-5 rounded bg-black/30 hover:bg-white/10 active:scale-125 text-[8px] flex items-center justify-center transition-colors">◀</button>
-                            <button onclick="window.deleteRoadmap(${idx}); event.stopPropagation()" class="w-5 h-5 rounded bg-rose-500/10 hover:bg-rose-500/30 text-rose-400 active:scale-125 text-[8px] flex items-center justify-center transition-colors">✕</button>
-                            <button onclick="window.shiftRoadmap(${idx}, 1); event.stopPropagation()" class="w-5 h-5 rounded bg-black/30 hover:bg-white/10 active:scale-125 text-[8px] flex items-center justify-center transition-colors">▶</button>
+                        <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto mt-1.5 sm:mt-0 flex-shrink-0">
+                            <button id="controlsToggleBtn" onclick="window.toggleControlPanel()" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-[10px] btn-5d text-indigo-300 font-bold flex items-center gap-1">
+                                ${controlsExpanded ? '<span>▲</span> Hide Tools' : '<span>▼</span> Show Tools'}
+                            </button>
+                            ${(appUser && appSecret) ? `
+                            <button onclick="window.editSong('${currentSong.SongID}')" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-[10px] btn-5d-primary text-white font-bold flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                Edit
+                            </button>` : ''}
+                        </div>
+                    </div>
+                    ${collapsibleControlsHTML}
+                </div>
+
+                <div class="mt-2.5 pr-1 sm:pr-2 pb-6 song-scroll-container flex-1 overflow-y-auto">
+                ${activeRoadmap.map((block, idx) => {
+                    const templateLines = sectionTemplates[block.name] || [];
+                    const blockOffset = block.keyOffset || 0;
+                    const blockEffectiveSemitones = semitones + blockOffset;
+                    const blockKeyName = window.getModulatedKeyName(currentKey, blockOffset);
+                    const displayModulationBadge = blockOffset !== 0 ? `<span class="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded px-1.5 py-0.5 font-mono ml-2 uppercase whitespace-nowrap">Key: ${blockKeyName} (${blockOffset >= 0 ? '+' : ''}${blockOffset})</span>` : '';
+
+                    // Smart section coloring
+                    let badgeColor = "bg-indigo-500/20 text-indigo-300 border-indigo-500/30";
+                    let nameLower = block.name.toLowerCase();
+                    if (nameLower.includes('chorus')) badgeColor = "bg-amber-500/20 text-amber-300 border-amber-500/30";
+                    else if (nameLower.includes('verse')) badgeColor = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+                    else if (nameLower.includes('bridge')) badgeColor = "bg-purple-500/20 text-purple-300 border-purple-500/30";
+                    else if (nameLower.includes('intro') || nameLower.includes('outro')) badgeColor = "bg-sky-500/20 text-sky-300 border-sky-500/30";
+
+                    const isOpen = sectionOpenStates[idx] !== false; // defaults to true
+
+                    return `
+                    <div id="sec-wrapper-${idx}" class="group bg-indigo-900/20 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(99,102,241,0.05)] transition-all border border-indigo-500/30 mb-4">
+                        <div onclick="window.toggleSection(${idx})" class="cursor-pointer p-3.5 bg-indigo-950/80 hover:bg-indigo-900/80 transition-colors font-bold text-[10px] uppercase tracking-widest flex justify-between items-center select-none sticky top-0 z-30 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-b border-indigo-500/30">
+                            <div class="flex items-center gap-2 overflow-hidden pr-2">
+                                <span class="text-[8px] ${badgeColor} border rounded px-1.5 py-0.5 font-mono flex-shrink-0 shadow-sm">#${idx + 1}</span>
+                                <span class="truncate ${badgeColor.split(' ')[1]} drop-shadow-sm">${block.name}</span>
+                                ${displayModulationBadge}
+                            </div>
+                            <span id="chevron-${idx}" class="chevron-icon text-indigo-400/50 text-xs sm:text-sm flex-shrink-0" style="transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0deg)'}">▼</span>
+                        </div>
+                        <div id="sec-content-${idx}" class="panel-wrap ${isOpen ? 'is-open' : ''}">
+                            <div class="panel-inner">
+                                <div class="p-3 sm:p-4 space-y-1 bg-transparent">
+                                    ${templateLines.map((l, lIdx) => {
+                                        if (!(block.enabledLines || []).includes(lIdx)) return '';
+
+                                        const transposed = window.transposeChord(l.Chords || '', blockEffectiveSemitones);
+                                        const numbers = window.getNumberForChord(transposed, blockKeyName);
+                                        const interactiveChords = window.makeChordsClickable(transposed);
+                                        
+                                        return `
+                                        <div class="line-block animate-fadeIn" onclick="window.toggleLineFocus(this)">
+                                        ${(displayMode !== 'numbers' && transposed) ? `<div class="chord-line mb-0.5" style="font-size: ${lyricZoom * 1.05}rem">${interactiveChords}</div>` : ''}
+                                        ${(displayMode !== 'chords' && numbers) ? `<div class="num-line mb-0.5" style="font-size: ${lyricZoom * 0.9}rem">${numbers}</div>` : ''}
+                                        ${(l.Lyrics) ? `<div class="lyric-line text-gray-200" style="font-size: ${lyricZoom}rem">${l.Lyrics}</div>` : ''}
+                                        </div>`;
+                                    }).join('')}
+                                </div>
+                            </div>
                         </div>
                     </div>`;
                 }).join('')}
-            </div>
-        </div>
-        
-        ${blockLineDissectorHTML}
-
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-white/5 select-none">
-            <div class="flex flex-wrap items-center gap-1.5">
-                <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold">Inject Block:</span>
-                ${Object.keys(sectionTemplates).map(sec => `
-                    <button onclick="window.addRoadmap('${sec}')" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-[9px] font-bold uppercase tracking-widest text-emerald-300 transition-all active:scale-95">
-                        + ${sec}
-                    </button>
-                `).join('')}
-            </div>
-            <button onclick="window.resetRoadmap()" class="px-3 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-[9px] font-bold uppercase tracking-widest text-rose-300 transition-all active:scale-95">
-                Reset Default
-            </button>
-        </div>
-    </div>` : '';
-
-    const collapsibleControlsHTML = `
-    <div id="collapsibleControls" class="${controlsExpanded ? '' : 'hidden'} mt-4 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-black/20 rounded-2xl border border-white/5">
-            <div class="flex items-center gap-1">
-                <button onclick="window.shiftKey(-1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">-</button>
-                <span class="w-12 text-center text-xs font-bold text-amber-400 font-mono">${currentKey}</span>
-                <button onclick="window.shiftKey(1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">+</button>
-            </div>
-            
-            <select onchange="displayMode=this.value; window.renderSong()" class="bg-black/30 text-xs py-2 px-3 rounded-xl text-gray-200 outline-none shadow-inner border border-white/5 transition-all appearance-none cursor-pointer">
-                <option value="chords" ${displayMode==='chords'?'selected':''}>Chords</option>
-                <option value="numbers" ${displayMode==='numbers'?'selected':''}>Numbers</option>
-                <option value="both" ${displayMode==='both'?'selected':''}>Both</option>
-            </select>
-            
-            <div class="flex items-center gap-1.5 border-l border-white/10 pl-3">
-                <button onclick="window.adjustZoom(-0.1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-xs text-gray-300">A-</button>
-                <button onclick="window.adjustZoom(0.1)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-xs text-gray-300">A+</button>
-            </div>
-
-            <div class="flex gap-1.5">
-                <button onclick="window.toggleFav('${currentSong.SongID}')" class="px-3.5 py-2 rounded-xl text-xs bg-black/30 border border-white/5 shadow-inner transition-all hover:bg-black/50 ${isFav?'text-amber-400 font-bold':'text-gray-500'} active:scale-95">
-                    ${isFav?'★ Fav':'☆ Fav'}
-                </button>
-                <button onclick="window.toggleSetlist('${currentSong.SongID}')" class="px-3.5 py-2 rounded-xl text-xs bg-black/30 border border-white/5 shadow-inner transition-all hover:bg-black/50 ${inSet?'text-violet-400 font-bold':'text-gray-500'} active:scale-95">
-                    ${inSet?'⚡ Set':'☆ Set'}
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-indigo-950/10 rounded-2xl border border-indigo-500/10">
-            <div class="flex items-center justify-between gap-2.5">
-                <button id="autoScrollBtn" onclick="window.toggleAutoScroll()" class="text-[10px] uppercase font-bold tracking-wider px-3 py-2 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-all flex items-center gap-1.5 active:scale-95">
-                    <svg id="scrollIcon" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                    <span id="scrollBtnText">Auto Scroll</span>
-                </button>
-                <div class="flex items-center gap-2 flex-1 max-w-[140px]">
-                    <span class="text-[9px] text-gray-500 uppercase font-mono select-none">Speed</span>
-                    <input type="range" id="scrollSpeedSlider" min="1" max="10" value="${scrollSpeed}" oninput="window.adjustScrollSpeed(this.value)" class="w-full accent-indigo-500 h-1 bg-white/5 rounded-lg appearance-none cursor-pointer">
                 </div>
-            </div>
-            
-            <div class="flex items-center justify-between gap-2 border-t sm:border-t-0 sm:border-l border-white/5 pt-2.5 sm:pt-0 sm:pl-3">
-                <div class="flex items-center gap-1">
-                    <button id="metronomeBtn" onclick="window.toggleMetronome()" class="text-[10px] uppercase font-bold tracking-wider px-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-1 active:scale-95 border border-white/5">
-                        <span id="metronomeDot" class="w-2 h-2 rounded-full bg-rose-500 opacity-20 scale-90 transition-all duration-100"></span>
-                        Metronome
-                    </button>
-                    <button onclick="window.tapTempo()" class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all active:scale-95 border border-rose-500/20">
-                        TAP
-                    </button>
-                </div>
-                <div class="flex items-center gap-1.5 flex-1 max-w-[120px]">
-                    <span class="text-[9px] text-gray-500 uppercase font-mono select-none">BPM</span>
-                    <input type="number" id="metronomeBpm" min="40" max="250" value="${bpm}" onchange="window.updateBpm(this.value)" oninput="window.updateBpm(this.value)" class="w-12 bg-black/40 text-center rounded-lg p-1 text-xs font-mono font-bold text-rose-300 outline-none focus:ring-1 focus:ring-rose-500/30 border border-white/5">
-                </div>
-            </div>
-        </div>
+            </div>`;
+        }
 
-        <div class="flex items-center justify-between gap-4 border-b border-white/5 pb-2.5">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-[9px] text-gray-500 uppercase tracking-widest font-mono font-bold select-none">Roadmap:</span>
-                ${roadmapHTML}
-            </div>
-            <button onclick="window.toggleArranger()" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center gap-1.5 flex-shrink-0">
-                🗺️ Arrange
-            </button>
-        </div>
-
-        ${arrangerPanelHTML}
-
-        <div class="mb-4 border-t border-white/5 pt-3">
-            ${window.getFamilyChordsHTML(currentKey)}
-        </div>
-    </div>
-    `;
-
-    const appView = document.getElementById('appView');
-    if (appView) {
-        appView.innerHTML = `
-        <div class="p-6 md:p-8 bg-white/5 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] flex flex-col max-h-[calc(100vh-8rem)] border border-white/5 transition-all">
-            <div class="flex-shrink-0">
-                <div class="flex justify-between items-center gap-4">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight text-white select-none">${currentSong.Title}</h2>
-                        <p class="text-sm text-indigo-300/80 mt-1 font-medium select-none">${currentSong.Artist || 'Unknown Artist'}</p>
-                    </div>
-                    <div class="flex items-center gap-2.5">
-                        <button onclick="window.toggleControlPanel()" class="px-3.5 py-2 rounded-xl text-xs bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-300 font-bold active:scale-95 transition-all flex items-center gap-1.5">
-                            ${controlsExpanded ? '<span>▲</span> Hide Tools' : '<span>▼</span> Show Tools'}
-                        </button>
-                        ${(appUser && appSecret) ? `
-                        <button onclick="window.editSong('${currentSong.SongID}')" class="px-4 py-2 rounded-xl text-xs bg-indigo-600/40 hover:bg-indigo-500 text-white font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5 border border-indigo-500/30">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            Edit
-                        </button>` : ''}
-                    </div>
-                </div>
-                ${collapsibleControlsHTML}
-            </div>
-
-            <div class="space-y-4 overflow-y-auto pr-2 pb-2 song-scroll-container flex-1 ${controlsExpanded ? 'mt-4' : 'mt-8'}">
-            ${activeRoadmap.map((block, idx) => {
-                const templateLines = sectionTemplates[block.name] || [];
-                const blockOffset = block.keyOffset || 0;
-                const blockEffectiveSemitones = semitones + blockOffset;
-                const blockKeyName = window.getModulatedKeyName(currentKey, blockOffset);
-                const displayModulationBadge = blockOffset !== 0 ? `<span class="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded px-1.5 py-0.5 font-mono ml-2 uppercase">Key: ${blockKeyName} (${blockOffset >= 0 ? '+' : ''}${blockOffset})</span>` : '';
-
-                return `
-                <details open id="sec-${idx}" class="group bg-black/15 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg transition-all border border-white/5">
-                    <summary class="cursor-pointer p-3.5 bg-white/5 hover:bg-white/10 transition-colors font-bold text-[10px] text-indigo-300 uppercase tracking-widest flex justify-between items-center select-none list-none [&::-webkit-details-marker]:hidden">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[8px] bg-indigo-500/20 text-indigo-300 rounded px-1.5 py-0.5 font-mono">#${idx + 1}</span>
-                            <span>${block.name}</span>
-                            ${displayModulationBadge}
-                        </div>
-                        <span class="chevron-icon text-gray-500 transition-transform duration-300 text-[10px]">▼</span>
-                    </summary>
-                    <div class="p-4 space-y-1 border-t border-white/5 bg-black/5">
-                        ${templateLines.map((l, lIdx) => {
-                            if (!(block.enabledLines || []).includes(lIdx)) return '';
-
-                            const transposed = window.transposeChord(l.Chords || '', blockEffectiveSemitones);
-                            const numbers = window.getNumberForChord(transposed, blockKeyName);
-                            const interactiveChords = window.makeChordsClickable(transposed);
-                            
-                            return `
-                            <div class="line-block animate-fadeIn" onclick="window.toggleLineFocus(this)">
-                            ${(displayMode !== 'numbers' && transposed) ? `<div class="chord-line mb-0.5" style="font-size: ${lyricZoom * 1.05}rem">${interactiveChords}</div>` : ''}
-                            ${(displayMode !== 'chords' && numbers) ? `<div class="num-line mb-0.5" style="font-size: ${lyricZoom * 0.9}rem">${numbers}</div>` : ''}
-                            ${(l.Lyrics) ? `<div class="lyric-line text-gray-200" style="font-size: ${lyricZoom}rem">${l.Lyrics}</div>` : ''}
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </details>`;
-            }).join('')}
-            </div>
-        </div>`;
+        window.renderPresetsListUI();
+    } catch(err) {
+        console.error("Rendering Error: ", err);
     }
-
-    window.renderPresetsListUI();
-    window.setupScrollListener(); // attach listener for back-to-top button
 }
 
 // Window Event Listeners
@@ -2068,7 +2620,7 @@ window.addEventListener('keydown', function(e) {
         e.preventDefault();
         if (currentSong) {
             window.toggleAutoScroll();
-            window.showToast(scrollInterval ? "Autoscrolling Started" : "Autoscrolling Paused", "info");
+            window.showToast(scrollAnimationId ? "Autoscrolling Started" : "Autoscrolling Paused", "info");
         }
     } else if (e.key === '[') {
         if (currentSong) {
