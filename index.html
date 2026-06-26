@@ -23,6 +23,52 @@ body {
     100% { opacity: 1; transform: scale(1.1); }
 }
 
+/* New Educational Animations */
+@keyframes continuousStrum {
+    0%, 5% { transform: scale(0); opacity: 0; }
+    10% { transform: scale(1.3); opacity: 1; filter: brightness(1.4); }
+    15%, 75% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    80%, 100% { transform: scale(0); opacity: 0; }
+}
+.strum-note {
+    animation: continuousStrum 4.5s infinite both cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes keyPressWhite {
+    0%, 5% { fill: #c7d2fe; }
+    10% { fill: #fbbf24; filter: drop-shadow(0 0 6px rgba(251,191,36,0.8)); }
+    15%, 75% { fill: #818cf8; filter: none; }
+    80%, 100% { fill: #c7d2fe; filter: none; }
+}
+@keyframes keyPressBlack {
+    0%, 5% { fill: #4f46e5; }
+    10% { fill: #fbbf24; filter: drop-shadow(0 0 6px rgba(251,191,36,0.8)); }
+    15%, 75% { fill: #6366f1; filter: none; }
+    80%, 100% { fill: #4f46e5; filter: none; }
+}
+.play-key-white {
+    animation: keyPressWhite 4.5s infinite both cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.play-key-black {
+    animation: keyPressBlack 4.5s infinite both cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes flowDash {
+    to { stroke-dashoffset: -16; }
+}
+.animate-flow {
+    stroke-dasharray: 4, 4;
+    animation: flowDash 0.8s linear infinite;
+}
+
+@keyframes bulbBlink {
+    0%, 100% { color: #818cf8; filter: drop-shadow(0 0 2px rgba(129,140,248,0.5)); transform: scale(1); }
+    50% { color: #fbbf24; filter: drop-shadow(0 0 10px rgba(251,191,36,1)); transform: scale(1.15); }
+}
+.animate-bulb {
+    animation: bulbBlink 2.5s infinite ease-in-out;
+}
+
 .chord-line { 
     color: #fbbf24; 
     font-weight: 700; 
@@ -50,6 +96,9 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+.custom-scrollbar::-webkit-scrollbar { height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.3); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.5); }
 
 /* Ultra-Smooth Expand/Collapse Engine */
 .panel-wrap {
@@ -105,25 +154,29 @@ body {
     opacity: 0;
 }
 
+/* Fullscreen Lyrics Wrapper Styles */
+#lyricsFullscreenWrap:-webkit-full-screen {
+    background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, #05060a 70%);
+    padding: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+#lyricsFullscreenWrap:fullscreen {
+    background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, #05060a 70%);
+    padding: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+#lyricsFullscreenWrap:fullscreen .fs-hide-btn {
+    display: none !important;
+}
+
 /* Edge Visual Metronome Pulse */
 .edge-pulse {
     box-shadow: inset 0 0 20px rgba(244, 63, 94, 0.4);
     border-color: rgba(244, 63, 94, 0.5) !important;
-}
-
-/* Custom Tooltip Styling with Pointer Triangle */
-#chordTooltip {
-    transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-#chordTooltip::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 8px 8px 0;
-    border-style: solid;
-    border-color: rgba(16, 17, 26, 0.95) transparent transparent transparent;
 }
 
 /* Music Note Loading Animation */
@@ -322,13 +375,283 @@ body {
 </div>
 <div id="overlay" onclick="window.toggleNav(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden transition-opacity"></div>
 
-<!-- Interactive Guitar Chord Diagram Tooltip -->
-<div id="chordTooltip" class="absolute hidden z-[500] bg-[#10111a]/95 backdrop-blur-xl border border-white/15 border-b-0 p-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-44 pointer-events-auto">
-    <div class="flex justify-between items-center mb-2">
-        <span id="tooltipChordName" class="text-xs font-bold text-amber-400 font-mono">Chord</span>
-        <button onclick="window.hideChordTooltip()" class="text-gray-500 hover:text-white text-xs p-1 transition-colors">✕</button>
+<!-- Interactive Musician's Intelligence Modal -->
+<div id="chordModalWrap" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[500] modal-overlay modal-hidden flex items-center justify-center p-4 sm:p-6" onclick="window.hideChordTooltip()">
+    <div id="chordTooltip" onclick="event.stopPropagation()" class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-xl border border-indigo-500/30 p-0 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] w-full max-w-[850px] flex flex-col modal-content overflow-hidden h-[650px] max-h-[85vh]">
+        <div class="flex justify-between items-start p-4 sm:p-5 border-b border-indigo-500/20 bg-indigo-900/20 shrink-0">
+            <div class="flex-1 min-w-0 pr-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <span id="tooltipChordName" class="text-xl sm:text-2xl font-bold text-amber-400 font-mono shadow-sm">Chord</span>
+                    <span id="tooltipChordRole" class="text-[10px] sm:text-xs px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-200 tracking-wider uppercase font-bold">Role</span>
+                    <!-- NEW: Explicit Key Synchronization Badge -->
+                    <span id="tooltipSongKey" class="text-[10px] sm:text-xs px-2.5 py-1 rounded border tracking-wider font-bold bg-sky-500/20 border-sky-500/30 text-sky-200 flex items-center gap-1 shadow-sm">
+                        <span class="text-sky-400">🔑</span> Key: C
+                    </span>
+                </div>
+                <p id="tooltipRoleDefinition" class="text-[10px] sm:text-xs text-indigo-300/80 mt-1.5 italic leading-snug"></p>
+            </div>
+            <button onclick="window.hideChordTooltip()" class="text-indigo-300 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-all active:scale-95 flex-shrink-0 text-lg mt-1">✕</button>
+        </div>
+        
+        <!-- Instrument Tabs (App Theme) -->
+        <div class="flex border-b border-indigo-500/20 bg-indigo-950/40 text-[10px] sm:text-xs font-bold uppercase tracking-wider select-none shrink-0">
+            <button onclick="window.switchChordTab('guitar')" id="tab-btn-guitar" class="chord-tab-btn">Guitar</button>
+            <button onclick="window.switchChordTab('keys')" id="tab-btn-keys" class="chord-tab-btn">Keys</button>
+            <button onclick="window.switchChordTab('bass')" id="tab-btn-bass" class="chord-tab-btn">Bass</button>
+            <button onclick="window.switchChordTab('lead')" id="tab-btn-lead" class="chord-tab-btn">Lead</button>
+            <button onclick="window.switchChordTab('ideas')" id="tab-btn-ideas" class="chord-tab-btn">Ideas</button>
+        </div>
+
+        <!-- Content Areas (Responsive Side-by-Side Dashboard) -->
+        <div class="p-4 sm:p-6 relative flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-b from-black/20 to-transparent">
+            
+            <!-- Guitar Tab -->
+            <div id="tab-content-guitar" class="chord-tab-content flex flex-col animate-fadeIn w-full pb-4">
+                <!-- Top Row: Open Shape & Capo + Strategy & Picking -->
+                <div class="flex flex-col sm:flex-row gap-5 shrink-0 w-full mb-5">
+                    <!-- Left: Main Open Shape & Capo -->
+                    <div class="sm:w-[40%] flex flex-col items-center bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0 relative">
+                        <button onclick="window.openFretboardHelp(); event.stopPropagation();" class="absolute top-3 left-3 animate-bulb transition-colors p-1 z-10" title="How to read these charts">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </button>
+
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-2 uppercase tracking-widest text-center w-full">Standard Open</h4>
+                        <div id="tooltipFretboard" class="w-full flex justify-center mt-2"></div>
+                        <div id="tooltipGuitarCapo" class="mt-4 w-full flex flex-wrap gap-1.5 justify-center"></div>
+                    </div>
+                    
+                    <!-- Right: Strategy & Picking -->
+                    <div class="sm:w-[60%] flex flex-col bg-indigo-900/20 p-4 sm:p-5 rounded-2xl border border-indigo-500/20 shadow-inner shrink-0 min-w-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">💡</span> Strategy & Right Hand</h4>
+                        <div id="tooltipGuitarInstructions" class="text-xs sm:text-[13px] text-gray-200 italic leading-relaxed whitespace-pre-line custom-scrollbar"></div>
+                        <div id="tooltipGuitarPicking" class="mt-auto pt-4 border-t border-indigo-500/20 text-amber-300 font-mono text-[10px] sm:text-xs p-3 bg-black/30 rounded-xl shadow-inner"></div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Power Chords & Drones -->
+                <div class="flex flex-col sm:flex-row gap-5 shrink-0 w-full mb-5">
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">⚡</span> Power Chords (Drive)</h4>
+                        <div id="tooltipGuitarPower" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                    </div>
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🌫️</span> Ambient Voicings</h4>
+                        <div id="tooltipGuitarAmbient" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Triads Gallery -->
+                <div class="flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0 mb-5">
+                    <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎸</span> Triad Inversions (Strings 1-3)</h4>
+                    <div id="tooltipGuitarTriads" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                </div>
+
+                <!-- Bottom Row: CAGED Movable Shapes -->
+                <div class="flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0 mb-2">
+                    <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">📍</span> Movable Neck Shapes (CAGED)</h4>
+                    <div id="tooltipGuitarMovable" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                </div>
+            </div>
+            
+            <!-- Keys Tab -->
+            <div id="tab-content-keys" class="chord-tab-content hidden flex-col animate-fadeIn w-full pb-4">
+                <!-- Top Row: Root Shape, Tenths, & Mechanics -->
+                <div class="flex flex-col sm:flex-row gap-5 shrink-0 w-full mb-5">
+                    <!-- Left: Root & 10th Voicings -->
+                    <div class="sm:w-[45%] flex flex-col items-center bg-black/20 rounded-2xl p-4 sm:p-5 pt-10 border border-indigo-500/20 shadow-inner shrink-0 relative min-w-0">
+                        <button onclick="window.openKeysHelp(); event.stopPropagation();" class="absolute top-3 left-3 animate-bulb transition-colors p-1 z-10" title="How to read these charts">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </button>
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-widest text-center w-full">Root Position</h4>
+                        <div id="tooltipKeysRoot" class="w-full flex justify-center mt-1"></div>
+                        
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mt-6 mb-3 pt-6 border-t border-indigo-500/20 uppercase tracking-widest text-center w-full">Open 10th (Big Sound)</h4>
+                        <div id="tooltipKeysTenth" class="w-full flex justify-center mt-1"></div>
+                    </div>
+                    
+                    <!-- Right: Strategy, Flow & Mechanics -->
+                    <div class="sm:w-[55%] flex flex-col bg-indigo-900/20 p-4 sm:p-5 rounded-2xl border border-indigo-500/20 shadow-inner shrink-0 min-w-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">💡</span> Mechanics & Flow</h4>
+                        <div id="tooltipKeysInstructions" class="text-xs sm:text-[13px] text-gray-200 italic leading-relaxed whitespace-pre-line custom-scrollbar"></div>
+                        <div id="tooltipKeysPlaying" class="mt-auto pt-4 border-t border-indigo-500/20 text-sky-300 font-mono text-[10px] sm:text-xs p-3 bg-black/30 rounded-xl shadow-inner"></div>
+                    </div>
+                </div>
+
+                <!-- Middle Row: Inversions & Extensions -->
+                <div class="flex flex-col sm:flex-row gap-5 shrink-0 w-full mb-5">
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎹</span> Triad Inversions</h4>
+                        <div id="tooltipPianoInversions" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                    </div>
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">✨</span> Worship Extensions (Pads)</h4>
+                        <div id="tooltipKeysExtensions" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-3 pt-2 items-center"></div>
+                    </div>
+                </div>
+
+                <!-- NEW Row: Sound Design & Organ -->
+                <div class="flex flex-col sm:flex-row gap-5 shrink-0 w-full mb-5">
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎛️</span> Patch Recipe</h4>
+                        <div id="tooltipKeysPatch" class="text-xs text-indigo-100 font-mono leading-relaxed whitespace-pre-line overflow-y-auto custom-scrollbar bg-black/40 p-3 rounded-xl border border-indigo-500/30 shadow-inner h-full flex items-center"></div>
+                    </div>
+                    <div class="sm:w-1/2 flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0">
+                        <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎹</span> Hammond B3 Drawbars</h4>
+                        <div id="tooltipKeysOrgan" class="text-xs text-white font-mono flex items-center justify-center h-full bg-black/60 rounded-xl border border-indigo-500/50 tracking-[0.3em] text-lg sm:text-2xl drop-shadow-md py-4 shadow-inner"></div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Animated Scales & Figures -->
+                <div class="flex flex-col min-w-0 bg-black/20 rounded-2xl p-4 sm:p-5 border border-indigo-500/20 shadow-inner shrink-0 mb-2">
+                    <h4 class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-3 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎼</span> Animated Scale Runs</h4>
+                    <div id="tooltipKeysScalesSVG" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-4 pt-2 items-center"></div>
+                    <div id="tooltipKeysScales" class="text-xs text-white font-mono leading-relaxed whitespace-pre-line overflow-y-auto custom-scrollbar pr-2 mt-4 bg-black/40 p-4 rounded-xl border border-indigo-500/20 shadow-inner max-h-[160px]"></div>
+                </div>
+            </div>
+
+            <!-- Bass Tab -->
+            <div id="tab-content-bass" class="chord-tab-content hidden flex-col sm:flex-row gap-6 animate-fadeIn w-full">
+                <div class="sm:w-[55%] flex flex-col border-b sm:border-b-0 sm:border-r border-indigo-500/20 pb-5 sm:pb-0 sm:pr-6 min-w-0">
+                    <h4 class="text-[11px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎸</span> Groove Matrix Shape</h4>
+                    <div id="tooltipBassFretboard" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-4 pt-1 items-center"></div>
+                </div>
+                <div class="sm:w-[45%] flex flex-col pt-2 sm:pt-0 shrink-0">
+                    <h4 class="text-[11px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">⏱</span> Rhythm Strategy</h4>
+                    <div id="tooltipBassGroove" class="text-xs text-gray-200 italic bg-indigo-900/20 p-5 rounded-2xl border border-indigo-500/20 leading-relaxed whitespace-pre-line mb-5"></div>
+                    <div id="tooltipBassNotes" class="text-xs text-white font-mono bg-black/40 p-5 rounded-2xl border border-indigo-500/20 whitespace-pre-line leading-relaxed shadow-inner"></div>
+                </div>
+            </div>
+
+            <!-- Lead Tab -->
+            <div id="tab-content-lead" class="chord-tab-content hidden flex-col sm:flex-row gap-6 animate-fadeIn w-full">
+                <div class="sm:w-[60%] flex flex-col border-b sm:border-b-0 sm:border-r border-indigo-500/20 pb-5 sm:pb-0 sm:pr-6 min-w-0">
+                    <h4 class="text-[11px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎶</span> Full Fretboard Scales</h4>
+                    <div id="tooltipLeadFretboard" class="w-full flex gap-5 overflow-x-auto snap-x custom-scrollbar pb-4 pt-1 items-center"></div>
+                </div>
+                <div class="sm:w-[40%] flex flex-col pt-2 sm:pt-0 shrink-0">
+                    <h4 class="text-[11px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">🎯</span> Target Tones & Scales</h4>
+                    <div id="tooltipLeadScale" class="flex flex-wrap gap-2 mb-5"></div>
+                    <div id="tooltipLeadTones" class="text-xs text-gray-200 leading-relaxed bg-indigo-900/20 p-5 rounded-2xl border border-indigo-500/20"></div>
+                </div>
+            </div>
+
+            <!-- Ideas Tab -->
+            <div id="tab-content-ideas" class="chord-tab-content hidden flex-col sm:flex-row gap-6 animate-fadeIn w-full">
+                <div class="sm:w-1/2 flex flex-col border-b sm:border-b-0 sm:border-r border-indigo-500/20 pb-5 sm:pb-0 sm:pr-6 min-w-0">
+                    <h4 class="text-[11px] sm:text-xs text-amber-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">✨</span> Beautiful Substitutions</h4>
+                    <div id="tooltipBeautifulChords" class="flex flex-wrap gap-3 mb-2"></div>
+                </div>
+                <div class="sm:w-1/2 flex flex-col pt-2 sm:pt-0 shrink-0">
+                    <h4 class="text-[11px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-wide flex items-center gap-1.5"><span class="text-base">📖</span> Contextual Function</h4>
+                    <div id="tooltipGenre" class="text-xs text-gray-200 leading-relaxed bg-indigo-900/20 p-5 rounded-2xl border border-indigo-500/20"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="tooltipFretboard" class="w-full flex justify-center"></div>
+</div>
+
+<!-- Fretboard Education Modal -->
+<div id="fretboardHelpModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[600] modal-overlay modal-hidden flex items-center justify-center p-4" onclick="window.closeFretboardHelp()">
+    <div onclick="event.stopPropagation()" class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-md shadow-[0_20px_50px_rgba(49,46,129,0.5)] border border-indigo-500/20 modal-content relative">
+        <button onclick="window.closeFretboardHelp()" class="absolute top-4 right-4 text-indigo-400/60 hover:text-white text-lg p-1 transition-colors">✕</button>
+        
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-indigo-500/20">
+            <svg class="w-8 h-8 text-amber-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider">How to read the charts</h3>
+        </div>
+        
+        <div class="space-y-4 text-xs text-indigo-100/90 leading-relaxed">
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🎸</span>
+                <div>
+                    <strong class="text-white block mb-0.5">The Fretboard Grid</strong>
+                    Horizontal lines are the guitar strings (the bottom line is your thickest E string, the top line is your thinnest e string). Vertical lines are the metal frets on the neck.
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🔢</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Position Numbers</strong>
+                    The numbers beneath the grid indicate exactly which fret position your hand should start at on the guitar neck.
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🔵</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Blue Number Bubbles</strong>
+                    These show you where to press your fingers. <b>'R'</b> is the Root note (the core note of the chord). Numbers like <b>3</b> or <b>5</b> represent musical intervals (the 3rd or 5th note of the scale).
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">❌</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Open Strings & Mutes</strong>
+                    A <span class="text-emerald-400 font-bold font-mono">Green O</span> means you should strum that string open (without pressing any fret). A <span class="text-rose-400 font-bold font-mono">Red X</span> means you MUST NOT play or strum that string at all.
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">⚡</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Yellow Sequence Line</strong>
+                    This dashed line visualizes the "geometric shape" of the chord across the strings, training your brain to memorize the pattern so you can slide it anywhere on the neck.
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="window.closeFretboardHelp()" class="w-full mt-6 py-3 btn-5d-primary text-white rounded-xl text-xs font-bold uppercase tracking-widest active:scale-95 transition-all shadow-lg">Got it</button>
+    </div>
+</div>
+
+<!-- Keys Education Modal -->
+<div id="keysHelpModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[600] modal-overlay modal-hidden flex items-center justify-center p-4" onclick="window.closeKeysHelp()">
+    <div onclick="event.stopPropagation()" class="bg-gradient-to-br from-indigo-950/95 via-[#0a0b16]/95 to-[#05060a]/95 backdrop-blur-3xl p-6 rounded-3xl w-full max-w-md shadow-[0_20px_50px_rgba(49,46,129,0.5)] border border-indigo-500/20 modal-content relative">
+        <button onclick="window.closeKeysHelp()" class="absolute top-4 right-4 text-indigo-400/60 hover:text-white text-lg p-1 transition-colors">✕</button>
+        
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-indigo-500/20">
+            <svg class="w-8 h-8 text-amber-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider">How to read the piano charts</h3>
+        </div>
+        
+        <div class="space-y-4 text-xs text-indigo-100/90 leading-relaxed">
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🎹</span>
+                <div>
+                    <strong class="text-white block mb-0.5">The Keyboard Layout</strong>
+                    The graphic perfectly mirrors a real piano keyboard. The lower wide keys are the natural white keys (C, D, E, F, G, A, B), and the upper floating keys are the sharps/flats.
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🔵</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Highlighted Keys</strong>
+                    The brightly colored purple and indigo keys indicate the exact notes that belong in this chord voicing.
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">✨</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Animated Key Presses</strong>
+                    The keys visually "press down" and glow yellow in a sequence. This sequential animation shows you the recommended order to arpeggiate or roll the chord.
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <span class="text-base mt-0.5">🎼</span>
+                <div>
+                    <strong class="text-white block mb-0.5">Inversions vs Extensions</strong>
+                    <b>Inversions</b> take the standard chord and shift the bottom note to the top, letting you play the same chord higher or lower to fit the mix. <b>Extensions</b> (like Sus2) swap notes out entirely to create lush, atmospheric pad sounds.
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="window.closeKeysHelp()" class="w-full mt-6 py-3 btn-5d-primary text-white rounded-xl text-xs font-bold uppercase tracking-widest active:scale-95 transition-all shadow-lg">Got it</button>
+    </div>
 </div>
 
 <!-- Admin Password Modal -->
@@ -433,7 +756,7 @@ body {
             <option value="G" class="bg-[#0a0b16]">G</option><option value="Ab" class="bg-[#0a0b16]">Ab</option><option value="A" class="bg-[#0a0b16]">A</option>
             <option value="Bb" class="bg-[#0a0b16]">Bb</option><option value="B" class="bg-[#0a0b16]">B</option>
         </select>
-        <input type="text" id="fVersion" placeholder="Version / Notes" class="col-span-2 bg-indigo-900/30 text-indigo-100 py-1.5 px-2.5 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
+        <input type="text" id="fVersion" maxlength="15" placeholder="Version / Notes" class="col-span-2 bg-indigo-900/30 text-indigo-100 py-1.5 px-2.5 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-400/60 shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] placeholder-indigo-300/50 transition-all border border-indigo-500/30 hover:bg-indigo-900/40 hover:border-indigo-400/50">
     </div>
     
     <div id="keyFamilyDisplay" class="mt-2 mb-1"></div>
@@ -615,6 +938,21 @@ window.toggleFullScreen = function() {
     }
 }
 
+window.toggleLyricsFullscreen = function() {
+    const wrap = document.getElementById('lyricsFullscreenWrap');
+    if (!wrap) return;
+
+    if (!document.fullscreenElement) {
+        wrap.requestFullscreen().catch((err) => {
+            window.showToast("Fullscreen is not supported on this browser or device.", "error");
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
 window.requestWakeLock = async function() {
     if ('wakeLock' in navigator) {
         try {
@@ -657,6 +995,27 @@ window.addEventListener('scroll', function() {
         }
     }
 });
+
+// Modal Help functions
+window.openFretboardHelp = function() {
+    const m = document.getElementById('fretboardHelpModal');
+    if (m) m.classList.remove('modal-hidden');
+}
+
+window.closeFretboardHelp = function() {
+    const m = document.getElementById('fretboardHelpModal');
+    if (m) m.classList.add('modal-hidden');
+}
+
+window.openKeysHelp = function() {
+    const m = document.getElementById('keysHelpModal');
+    if (m) m.classList.remove('modal-hidden');
+}
+
+window.closeKeysHelp = function() {
+    const m = document.getElementById('keysHelpModal');
+    if (m) m.classList.add('modal-hidden');
+}
 
 // ==========================================
 // UTILITY FUNCTIONS
@@ -719,7 +1078,7 @@ window.getFamilyChordsHTML = function(keyStr) {
         for (let i=0; i<7; i++) {
             const noteIdx = (idx + intervals[i]) % 12;
             const rawChord = `${scaleNotes[noteIdx]}${qualities[i]}`;
-            familyHTML += `<span class="bg-indigo-500/20 border border-indigo-500/30 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-indigo-50 font-bold shadow-sm transition-all hover:bg-indigo-500/40 hover:scale-105 active:scale-95 cursor-help text-xs sm:text-sm" onclick="window.showChordTooltip(event, '${rawChord}')"><span class="text-indigo-400/80 mr-1.5">${degrees[i]}</span>${scaleNotes[noteIdx]}${qualities[i]}</span>`;
+            familyHTML += `<span class="bg-indigo-500/20 border border-indigo-500/30 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-indigo-50 font-bold shadow-sm transition-all hover:bg-sky-500/40 hover:text-white hover:scale-105 active:scale-95 cursor-help text-xs sm:text-sm" onclick="window.showChordTooltip(event, '${rawChord}', '${keyStr}')"><span class="text-indigo-400/80 mr-1.5">${degrees[i]}</span>${scaleNotes[noteIdx]}${qualities[i]}</span>`;
         }
     }
     
@@ -1116,8 +1475,8 @@ window.renderList = function() {
                 </div>
 
                 <!-- Floating Version Badge -->
-                <div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-30 bg-indigo-900/95 backdrop-blur-md border border-indigo-500/40 text-indigo-100 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded shadow-[0_4px_12px_rgba(0,0,0,0.6)] translate-x-2 group-hover:translate-x-0 flex items-center gap-0.5">
-                    <span class="text-indigo-400 font-normal">v</span>${s.Version || '1.0'}
+                <div class="absolute right-2 top-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 z-30 bg-indigo-900/70 backdrop-blur-md border border-indigo-500/30 text-indigo-100 text-[9px] font-mono px-1.5 py-0.5 rounded shadow-[0_4px_12px_rgba(0,0,0,0.4)] translate-x-2 group-hover:translate-x-0 flex items-center gap-0.5">
+                    <span class="text-indigo-400">v</span>${s.Version || '1.0'}
                 </div>
             </div>`;
         });
@@ -1404,21 +1763,799 @@ window.toggleLineFocus = function(element) {
     }
 }
 
-window.showChordTooltip = function(event, chordName) {
+window.switchChordTab = function(tab) {
+    // Hide all contents completely
+    document.querySelectorAll('.chord-tab-content').forEach(el => {
+        el.classList.add('hidden');
+    });
+    
+    // Reset all buttons to inactive state
+    document.querySelectorAll('.chord-tab-btn').forEach(el => {
+        el.className = 'flex-1 py-3.5 transition-colors chord-tab-btn text-indigo-300/60 bg-transparent hover:bg-indigo-900/40 hover:text-indigo-200 text-[11px] sm:text-xs font-bold border-b-2 border-transparent';
+    });
+    
+    const content = document.getElementById('tab-content-' + tab);
+    const btn = document.getElementById('tab-btn-' + tab);
+    
+    if (content) {
+        content.classList.remove('hidden');
+    }
+    if (btn) {
+        // Apply solid app theme active state
+        btn.className = 'flex-1 py-3.5 transition-all chord-tab-btn text-white bg-indigo-600/60 shadow-[0_0_20px_rgba(79,70,229,0.3)] text-[11px] sm:text-xs font-extrabold border-b-2 border-indigo-400 z-10 relative';
+    }
+}
+
+window.drawRelativeFretboard = function(numStrings, numFrets, dots, minFret = 1, sequenceLine = false, boxName = "") {
+    let w = 260; 
+    let stringSpacing = 24; 
+    let topPadding = 20;
+    let h = (numStrings - 1) * stringSpacing;
+    let svgHeight = h + topPadding + 32; 
+    let fretSpacing = w / numFrets;
+    
+    // Completely fluid layout wrapper
+    let svg = `<div class="flex flex-col items-center snap-center shrink-0 bg-black/30 p-4 sm:p-5 rounded-2xl border border-indigo-500/20 relative shadow-inner" style="width: ${w + 40}px; max-width: 100%; flex: 0 0 auto;">`;
+    if (boxName) svg += `<span class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-widest text-center">${boxName}</span>`;
+    
+    // Aspect-ratio preserves height flawlessly without flexing bugs
+    svg += `<svg viewBox="0 0 ${w} ${svgHeight}" style="width: 100%; height: auto; aspect-ratio: ${w} / ${svgHeight}; display: block;" class="select-none font-mono">`;
+    
+    // Draw strings
+    for(let i=0; i<numStrings; i++) {
+        let y = topPadding + (i * stringSpacing);
+        let strokeColor = i === 0 || (numStrings === 6 && i === 1) ? '#ffffff' : '#9ca3af';
+        let strokeW = 1.5 + (i * 0.4);
+        svg += `<line x1="15" y1="${y}" x2="${w-15}" y2="${y}" stroke="${strokeColor}" stroke-opacity="0.7" stroke-width="${strokeW}"></line>`;
+    }
+    
+    // Draw frets
+    for(let i=0; i<=numFrets; i++) {
+        let x = 15 + (i * fretSpacing * 0.85);
+        svg += `<line x1="${x}" y1="${topPadding}" x2="${x}" y2="${topPadding + h}" stroke="#4b5563" stroke-width="2"></line>`;
+        if (i < numFrets) {
+            svg += `<text x="${x + (fretSpacing * 0.425)}" y="${topPadding + h + 22}" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">${minFret + i}</text>`;
+        }
+    }
+
+    // Sequence Line (Updated to Amber/Yellow theme and animated flow)
+    if (sequenceLine && dots.length > 0) {
+        let sortedDots = [...dots].sort((a, b) => b.s !== a.s ? b.s - a.s : a.f - b.f);
+        let polyPoints = sortedDots.map(d => `${15 + ((d.f - minFret + 0.5) * fretSpacing * 0.85)},${topPadding + (d.s * stringSpacing)}`).join(' ');
+        svg += `<polyline points="${polyPoints}" fill="none" stroke="#fbbf24" stroke-opacity="0.8" stroke-width="2.5" class="animate-flow"></polyline>`;
+    }
+    
+    // Draw dots with sequential pop-in animation
+    dots.forEach(dot => {
+        let y = topPadding + (dot.s * stringSpacing);
+        let x = 15 + ((dot.f - minFret + 0.5) * fretSpacing * 0.85);
+        let isRoot = dot.label === 'R';
+        let r = isRoot ? 13 : 11;
+        let delay = (numStrings - 1 - dot.s) * 150; // Stagger animation from lowest string to highest
+        
+        svg += `<g class="pop-in-note" style="animation-delay: ${delay}ms; transform-origin: ${x}px ${y}px;">
+                    <circle cx="${x}" cy="${y}" r="${r}" fill="${dot.color}" stroke="${isRoot ? '#e0e7ff' : '#6366f1'}" stroke-width="2"></circle>
+                    <text x="${x}" y="${y+4}" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">${dot.label}</text>
+                </g>`;
+    });
+    
+    svg += `</svg></div>`;
+    return svg;
+}
+
+window.generateGuitarTriads = function(rootIdx, isMinor) {
+    const stringBases = [4, 11, 7, 2, 9, 4]; // e, B, G, D, A, E
+    const intervals = isMinor ? [0, 3, 7] : [0, 4, 7];
+    const labels = isMinor ? ['R', 'b3', '5'] : ['R', '3', '5'];
+    const colors = ['#4f46e5', '#818cf8', '#818cf8'];
+
+    // Map Root, 3rd, and 5th to the G string (string index 2)
+    let fretG_R = (rootIdx - 7 + 12) % 12;
+    if (fretG_R === 0) fretG_R = 12;
+
+    let thirdIdx = (rootIdx + intervals[1]) % 12;
+    let fretG_3 = (thirdIdx - 7 + 12) % 12;
+    if (fretG_3 === 0) fretG_3 = 12;
+
+    let fifthIdx = (rootIdx + intervals[2]) % 12;
+    let fretG_5 = (fifthIdx - 7 + 12) % 12;
+    if (fretG_5 === 0) fretG_5 = 12;
+
+    function getClosestFret(stringIdx, targetNoteIdx, refFret) {
+        let base = stringBases[stringIdx];
+        let f = (targetNoteIdx - base + 24) % 12;
+        if (Math.abs(f + 12 - refFret) < Math.abs(f - refFret)) f += 12;
+        if (f === 0 && refFret > 6) f = 12;
+        return f;
+    }
+
+    let triads = [
+        { name: "Root Pos", gFret: fretG_R, gNote: 0 },
+        { name: "1st Inv", gFret: fretG_3, gNote: 1 },
+        { name: "2nd Inv", gFret: fretG_5, gNote: 2 }
+    ].sort((a, b) => a.gFret - b.gFret);
+
+    let html = '';
+    triads.forEach(t => {
+        let dots = [];
+        
+        let n1 = t.gNote;
+        dots.push({ s: 2, f: t.gFret, label: labels[n1], color: n1===0 ? colors[0] : colors[1] });
+
+        let n2 = (t.gNote + 1) % 3;
+        let targetIdx2 = (rootIdx + intervals[n2]) % 12;
+        let fB = getClosestFret(1, targetIdx2, t.gFret);
+        dots.push({ s: 1, f: fB, label: labels[n2], color: n2===0 ? colors[0] : colors[1] });
+
+        let n3 = (t.gNote + 2) % 3;
+        let targetIdx3 = (rootIdx + intervals[n3]) % 12;
+        let fe = getClosestFret(0, targetIdx3, t.gFret);
+        dots.push({ s: 0, f: fe, label: labels[n3], color: n3===0 ? colors[0] : colors[1] });
+
+        let minF = Math.min(t.gFret, fB, fe);
+        let maxF = Math.max(t.gFret, fB, fe);
+        let displayMinFret = Math.max(1, minF - 1);
+        let span = Math.max(4, maxF - displayMinFret + 2);
+
+        html += window.drawRelativeFretboard(6, span, dots, displayMinFret, true, t.name);
+    });
+    return html;
+}
+
+window.generateMovableShapes = function(rootIdx, isMinor) {
+    let shapes = [];
+    const colors = { 'R': '#4f46e5', '3': '#818cf8', 'b3': '#818cf8', '5': '#818cf8' };
+
+    // E Form (Root 6)
+    let r6 = (rootIdx - 4 + 12) % 12;
+    if (r6 === 0) r6 = 12;
+    let eDots = isMinor ? [
+        {s:5, f:r6, label:'R'}, {s:4, f:r6+2, label:'5'}, {s:3, f:r6+2, label:'R'},
+        {s:2, f:r6, label:'b3'}, {s:1, f:r6, label:'5'}, {s:0, f:r6, label:'R'}
+    ] : [
+        {s:5, f:r6, label:'R'}, {s:4, f:r6+2, label:'5'}, {s:3, f:r6+2, label:'R'},
+        {s:2, f:r6+1, label:'3'}, {s:1, f:r6, label:'5'}, {s:0, f:r6, label:'R'}
+    ];
+    shapes.push({ name: "E-Shape (Root 6)", dots: eDots.map(d => ({...d, color: colors[d.label]})) });
+
+    // A Form (Root 5)
+    let r5 = (rootIdx - 9 + 12) % 12;
+    if (r5 === 0) r5 = 12;
+    let aDots = isMinor ? [
+        {s:4, f:r5, label:'R'}, {s:3, f:r5+2, label:'5'}, {s:2, f:r5+2, label:'R'},
+        {s:1, f:r5+1, label:'b3'}, {s:0, f:r5, label:'5'}
+    ] : [
+        {s:4, f:r5, label:'R'}, {s:3, f:r5+2, label:'5'}, {s:2, f:r5+2, label:'R'},
+        {s:1, f:r5+2, label:'3'}, {s:0, f:r5, label:'5'}
+    ];
+    shapes.push({ name: "A-Shape (Root 5)", dots: aDots.map(d => ({...d, color: colors[d.label]})) });
+
+    // D Form (Root 4)
+    let r4 = (rootIdx - 2 + 12) % 12;
+    if (r4 === 0) r4 = 12;
+    let dDots = isMinor ? [
+        {s:3, f:r4, label:'R'}, {s:2, f:r4+2, label:'5'},
+        {s:1, f:r4+3, label:'R'}, {s:0, f:r4+1, label:'b3'}
+    ] : [
+        {s:3, f:r4, label:'R'}, {s:2, f:r4+2, label:'5'},
+        {s:1, f:r4+3, label:'R'}, {s:0, f:r4+2, label:'3'}
+    ];
+    shapes.push({ name: "D-Shape (Root 4)", dots: dDots.map(d => ({...d, color: colors[d.label]})) });
+
+    // C Form (Root 5 - Major only for simplicity/standard)
+    if (!isMinor) {
+        let rc = r5;
+        if (rc < 3) rc += 12;
+        let cDots = [
+            {s:4, f:rc, label:'R'}, {s:3, f:rc-1, label:'3'}, {s:2, f:rc-3, label:'5'},
+            {s:1, f:rc-2, label:'R'}, {s:0, f:rc-3, label:'3'}
+        ];
+        shapes.push({ name: "C-Shape (Root 5)", dots: cDots.map(d => ({...d, color: colors[d.label]})) });
+    }
+
+    shapes.sort((a,b) => Math.min(...a.dots.map(d=>d.f)) - Math.min(...b.dots.map(d=>d.f)));
+
+    let html = '';
+    shapes.forEach(t => {
+        let minF = Math.min(...t.dots.map(d=>d.f));
+        let maxF = Math.max(...t.dots.map(d=>d.f));
+        let displayMinFret = Math.max(1, minF - 1);
+        let span = Math.max(4, maxF - displayMinFret + 2);
+        html += window.drawRelativeFretboard(6, span, t.dots, displayMinFret, false, t.name);
+    });
+    return html;
+}
+
+window.generatePowerChords = function(rootIdx) {
+    let shapes = [];
+    
+    // Root 6
+    let r6 = (rootIdx - 4 + 12) % 12;
+    if(r6 === 0) r6 = 12;
+    let dots6 = [
+        {s:5, f:r6, label:'R', color:'#4f46e5'},
+        {s:4, f:r6+2, label:'5', color:'#818cf8'},
+        {s:3, f:r6+2, label:'R', color:'#4f46e5'}
+    ];
+    shapes.push({name: "Root 6 (E String)", dots: dots6});
+
+    // Root 5
+    let r5 = (rootIdx - 9 + 12) % 12;
+    if(r5 === 0) r5 = 12;
+    let dots5 = [
+        {s:4, f:r5, label:'R', color:'#4f46e5'},
+        {s:3, f:r5+2, label:'5', color:'#818cf8'},
+        {s:2, f:r5+2, label:'R', color:'#4f46e5'}
+    ];
+    shapes.push({name: "Root 5 (A String)", dots: dots5});
+
+    let html = '';
+    shapes.forEach(t => {
+        let minF = Math.min(...t.dots.map(d=>d.f));
+        let maxF = Math.max(...t.dots.map(d=>d.f));
+        let span = Math.max(4, maxF - minF + 2);
+        html += window.drawRelativeFretboard(6, span, t.dots, Math.max(1, minF - 1), false, t.name);
+    });
+    return html;
+}
+
+window.generateAmbientVoicings = function(rootIdx, isMinor) {
+    let shapes = [];
+    
+    // Sus2 (Root 5)
+    let r5 = (rootIdx - 9 + 12) % 12;
+    if(r5 === 0) r5 = 12;
+    let sus2Dots = [
+        {s:4, f:r5, label:'R', color:'#4f46e5'},
+        {s:3, f:r5+2, label:'5', color:'#818cf8'},
+        {s:2, f:r5+2, label:'2', color:'#fbbf24'}, 
+        {s:1, f:r5+3, label:'5', color:'#818cf8'}
+    ];
+    shapes.push({name: "Lush Sus2", dots: sus2Dots});
+
+    // Add9 (Root 5)
+    let add9Dots = isMinor ? [
+        {s:4, f:r5, label:'R', color:'#4f46e5'},
+        {s:3, f:r5+2, label:'5', color:'#818cf8'},
+        {s:2, f:r5+4, label:'9', color:'#fbbf24'}, 
+        {s:1, f:r5+1, label:'b3', color:'#818cf8'}
+    ] : [
+        {s:4, f:r5, label:'R', color:'#4f46e5'},
+        {s:3, f:r5+2, label:'5', color:'#818cf8'},
+        {s:2, f:r5+4, label:'9', color:'#fbbf24'}, 
+        {s:1, f:r5+2, label:'3', color:'#818cf8'}
+    ];
+    shapes.push({name: isMinor ? "Minor Add9" : "Major Add9", dots: add9Dots});
+
+    let html = '';
+    shapes.forEach(t => {
+        let minF = Math.min(...t.dots.map(d=>d.f));
+        let maxF = Math.max(...t.dots.map(d=>d.f));
+        let span = Math.max(5, maxF - minF + 2); 
+        html += window.drawRelativeFretboard(6, span, t.dots, Math.max(1, minF - 1), false, t.name);
+    });
+    return html;
+}
+
+window.generateScaleBoxes = function(rootIdx, intervals, numStrings, boxesConfig) {
+    let stringBases = numStrings === 4 ? [7, 2, 9, 4] : [4, 11, 7, 2, 9, 4]; // Bass vs Guitar
+    let html = "";
+    
+    boxesConfig.forEach(box => {
+        let dots = [];
+        for (let s = 0; s < numStrings; s++) {
+            for (let f = box.minFret; f < box.minFret + box.span; f++) {
+                let noteIdx = (stringBases[s] + f) % 12;
+                let intervalFromRoot = (noteIdx - rootIdx + 12) % 12;
+                
+                if (intervals.includes(intervalFromRoot)) {
+                    let isRoot = intervalFromRoot === 0;
+                    let isBlue = intervalFromRoot === 6 || intervalFromRoot === 3;
+                    let color = isRoot ? '#4f46e5' : (isBlue ? '#6366f1' : '#818cf8');
+                    let label = isRoot ? 'R' : intervalFromRoot;
+                    
+                    if (intervalFromRoot === 10) label = 'b7';
+                    if (intervalFromRoot === 3) label = 'b3';
+                    if (intervalFromRoot === 4) label = '3';
+                    if (intervalFromRoot === 7) label = '5';
+                    if (intervalFromRoot === 2) label = '2';
+                    if (intervalFromRoot === 9) label = '6';
+
+                    dots.push({s: s, f: f, label: label, color: color});
+                }
+            }
+        }
+        html += window.drawRelativeFretboard(numStrings, box.span, dots, box.minFret, true, box.name);
+    });
+    return html;
+}
+
+window.getChordTheoryData = function(root, quality, songKey) {
+    const rootIdx = NOTE_TO_INDEX[root];
+    const keyIdx = NOTE_TO_INDEX[songKey] !== undefined ? NOTE_TO_INDEX[songKey] : rootIdx;
+    if (rootIdx === undefined) return null;
+
+    const interval = (rootIdx - keyIdx + 12) % 12;
+    const isMinor = quality.includes('m') && !quality.includes('dim');
+    const isDim = quality.includes('dim');
+    const isDom = quality.includes('7') && !quality.includes('maj7') && !isMinor && !isDim;
+    
+    const thirdIdx = (rootIdx + (isMinor || isDim ? 3 : 4)) % 12;
+    const fifthIdx = (rootIdx + (isDim ? 6 : 7)) % 12;
+    const seventhIdx = isDom ? (rootIdx + 10) % 12 : (quality.includes('maj7') ? (rootIdx + 11) % 12 : null);
+    
+    const notes = [NOTES[rootIdx], NOTES[thirdIdx], NOTES[fifthIdx]];
+    if (seventhIdx !== null) notes.push(NOTES[seventhIdx]);
+
+    let roleName = "";
+    let roleDef = ""; 
+    let scalesList = [];
+    let scaleIntervals = [];
+    let bassIntervals = [];
+    let targetTones = "";
+    let beautiful = [];
+    let genre = "";
+    let bassIdea = "";
+    let scaleFiguresText = "";
+
+    // Capo Calculator Logic
+    let capoOptions = [];
+    const openShapes = [
+        { shape: 'E', r: 4 }, { shape: 'A', r: 9 }, { shape: 'D', r: 2 }, { shape: 'C', r: 0 }, { shape: 'G', r: 7 }
+    ];
+    openShapes.forEach(os => {
+        let fret = (rootIdx - os.r + 12) % 12;
+        if (fret > 0 && fret <= 9) {
+            capoOptions.push(`<span class="bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 px-2 py-1 rounded text-[10px] shadow-sm font-semibold">Capo ${fret} ➔ <b>${os.shape}</b></span>`);
+        }
+    });
+    capoOptions.sort((a, b) => parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]));
+
+    // Dynamic Right Hand & Tone Suggestions
+    let pickingPattern = isMinor ? "Thumb(R) - Index(3rd) - Middle(5th)" : "Thumb(R) - Middle(5th) - Index(3rd)";
+    let strummingPattern = "D - D - U - U - D - U (Classic 16th)";
+    let toneSuggestion = "Clean + Modulated Reverb + Dotted 8th Delay";
+    
+    // Dynamic Keys Suggestions (Defaults)
+    let keysIdea = "• Main Mix: Play Root position in left hand, Inversions in right hand.\n• Ambient: Hold extensions (Sus2/Add9).";
+    let keysLeftHandWithBass = "Omit root or play sparse 1-5. Stay out of the muddy low-end frequencies.";
+    let keysLeftHandNoBass = "Play wide 1-5-8 or 1-5-10 octaves to fill the deep sub frequencies.";
+    let pedalPoint = "Hold the root note of the song's key on top.";
+    let passingChord = "Transition smoothly on the upbeat.";
+    let keysTone = "Warm Pad Layer + Bright Grand Piano";
+    let patchRecipe = "Layer 1: Grand Piano (Cutoff 80%)\nLayer 2: Warm Analog Pad\nLayer 3: Shimmer Reverb (+1 Octave)\nArp: None";
+    let organDrawbars = "88 8800 000";
+
+    // Calculate Absolute Notes for Piano Inversions
+    const rootAbs = (rootIdx < 5) ? rootIdx + 12 : rootIdx; 
+    const thirdAbs = rootAbs + (isMinor || isDim ? 3 : 4);
+    const fifthAbs = rootAbs + (isDim ? 6 : 7);
+    const sevAbs = seventhIdx !== null ? rootAbs + (isDom ? 10 : 11) : null;
+
+    let inv0 = [rootAbs, thirdAbs, fifthAbs];
+    if (sevAbs) inv0.push(sevAbs);
+    
+    let inv1 = [thirdAbs, fifthAbs, rootAbs + 12];
+    if (sevAbs) inv1.push(sevAbs > rootAbs + 12 ? sevAbs : sevAbs + 12);
+    
+    let inv2 = [fifthAbs, rootAbs + 12, thirdAbs + 12];
+    if (sevAbs) inv2.push(sevAbs > fifthAbs ? sevAbs : sevAbs + 12);
+
+    let pianoInversions = [
+        { name: "Root Pos", notes: inv0 },
+        { name: "1st Inv", notes: inv1 },
+        { name: "2nd Inv", notes: inv2 }
+    ];
+
+    let openTenthNotes = [rootAbs, fifthAbs, rootAbs + (isMinor || isDim ? 15 : 16)];
+    
+    let keysExtensions = [];
+    let sus2Abs = [rootAbs, rootAbs + 2, fifthAbs, rootAbs + 12];
+    keysExtensions.push({name: "Lush Sus2", notes: sus2Abs});
+    let add9Abs = isMinor ? [rootAbs, thirdAbs, fifthAbs, rootAbs + 14] : [rootAbs, thirdAbs, fifthAbs, rootAbs + 14];
+    keysExtensions.push({name: isMinor ? "Minor Add9" : "Major Add9", notes: add9Abs});
+    
+    let guitarIdea = "• If acoustic, use the Capo Guide to stay in open position.\n• If electric and the chorus is huge, use the Power Chords to prevent muddiness.\n• For quiet verses, pick the Ambient Voicings or Triads individually.";
+
+    let animatedScales = [];
+
+    // Key-Relative Music Theory Intelligence Engine
+    if (isMinor) {
+        scaleIntervals = [0, 2, 3, 5, 7, 9, 10]; // Dorian Default
+        bassIntervals = [0, 3, 7, 10];
+        scaleFiguresText = `Dorian:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+3)%12]} - ${NOTES[(rootIdx+5)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]} - ${NOTES[(rootIdx+10)%12]}\n\nMinor Pentatonic:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+3)%12]} - ${NOTES[(rootIdx+5)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+10)%12]}\n\nMinor Blues:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+3)%12]} - ${NOTES[(rootIdx+5)%12]} - ${NOTES[(rootIdx+6)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+10)%12]}`;
+        strummingPattern = "D - D - D - D U (Driving 8th)";
+
+        animatedScales.push({ name: "Dorian", intervals: [0, 2, 3, 5, 7, 9, 10] });
+        animatedScales.push({ name: "Minor Pentatonic", intervals: [0, 3, 5, 7, 10] });
+        animatedScales.push({ name: "Minor Blues", intervals: [0, 3, 5, 6, 7, 10] });
+        animatedScales.push({ name: "Harmonic Minor", intervals: [0, 2, 3, 5, 7, 8, 11] });
+        animatedScales.push({ name: "Melodic Minor", intervals: [0, 2, 3, 5, 7, 9, 11] });
+
+        if (interval === 2) { // ii
+            roleName = "ii (Supertonic)";
+            roleDef = "A minor chord that naturally pulls towards the V (Dominant) chord. Great for smooth passing.";
+            scalesList = ["Dorian", "Minor Pentatonic", "Minor Blues", "Melodic Minor"];
+            targetTones = `Target the 9th (${NOTES[(rootIdx+2)%12]}) for a jazzy/neo-soul R&B vibe. Avoid the b6.`;
+            beautiful = [`${root}m7`, `${root}m9`, `${root}m11`, `${root}m6`];
+            genre = "Sets up the V chord beautifully. Great for smooth, walking transitions in Gospel/R&B/Jazz.";
+            bassIdea = "Play the root, then walk up the scale to reach the next structural chord.";
+            toneSuggestion = "Warm Clean + Compressor + Analog Delay";
+            keysIdea = "• Main Mix: Play 1st inversion to leave room for the vocal melody.\n• Passing: Walk into this chord chromatically from the I.";
+            pedalPoint = `Anchor the 5th (${NOTES[(keyIdx+7)%12]}) of the key on top.`;
+            passingChord = `Approach with ${NOTES[(rootIdx-2+12)%12]}dim7 or VI7.`;
+            patchRecipe = "Layer 1: Electric Piano (Rhodes)\nLayer 2: Vintage Chorus\nLayer 3: Subtle Spring Reverb";
+            organDrawbars = "80 8800 008";
+        } else if (interval === 4) { // iii
+            roleName = "iii (Mediant)";
+            roleDef = "A minor chord that creates descending, somewhat melancholic tension. Often passes to the IV or vi.";
+            scaleIntervals = [0, 1, 3, 5, 7, 8, 10]; // Phrygian
+            scalesList = ["Phrygian", "Minor Pentatonic", "Harmonic Minor"];
+            targetTones = `Emphasize the b2 (${NOTES[(rootIdx+1)%12]}) for tension, or stick to root/5th for standard worship.`;
+            beautiful = [`${root}m7`, `${root}m(add11)`, `${root}m7b9`];
+            genre = "Creates a descending, melancholic transition to the IV or vi chord.";
+            bassIdea = "Keep it sparse. Root notes usually suffice as this chord passes quickly.";
+            pedalPoint = `Hold the 5th (${NOTES[(keyIdx+7)%12]}) of the key.`;
+            passingChord = "Usually a quick passing chord; don't linger.";
+            patchRecipe = "Layer 1: Soft Felt Piano\nLayer 2: String Ensemble Pad\nEQ: Low Pass Filter at 1kHz";
+            organDrawbars = "00 8800 000";
+        } else { // vi or Borrowed minor
+            roleName = interval === 9 ? "vi (Submediant)" : "Borrowed Minor";
+            roleDef = "The emotional, minor center of the key. Often used to build deep tension before a big chorus.";
+            scaleIntervals = [0, 2, 3, 5, 7, 8, 10]; // Aeolian
+            scalesList = ["Aeolian (Natural Minor)", "Harmonic Minor", "Minor Pentatonic", "Blues"];
+            targetTones = `The b6 (${NOTES[(rootIdx+8)%12]}) gives this the classic sad, emotional anchor.`;
+            beautiful = [`${root}m7`, `${root}m9`, `${root}m(maj7)`, `${root}m11`];
+            genre = "The emotional center of the song. Builds deep tension before big victorious choruses (Pop/Rock/Worship).";
+            bassIdea = "Anchor heavily. Lock in with the kick drum. Octave jumps work great here.";
+            toneSuggestion = "Light Overdrive + Big Hall Reverb";
+            keysIdea = "• Main Mix: Lean into minor 3rd emphasis for emotion.\n• Play dark 10th voicings in the left hand if no bass.";
+            pedalPoint = `Hold the minor 3rd (${NOTES[thirdIdx]}) on top for maximum emotion.`;
+            passingChord = `Approach strongly with a III7 (${NOTES[(rootIdx+7)%12]}7) chord.`;
+            patchRecipe = "Layer 1: Upright Piano (Lid Closed)\nLayer 2: Swelling Analog Pad\nFX: Long Decay Hall Reverb";
+            organDrawbars = "88 8000 000";
+        }
+    } else if (isDim) {
+        roleName = "Diminished";
+        roleDef = "Extreme, unresolved tension. Usually used as a quick passing chord to resolve up a half-step.";
+        scaleIntervals = [0, 1, 3, 4, 6, 7, 9, 10];
+        bassIntervals = [0, 3, 6, 9];
+        scalesList = ["Half-Whole Diminished", "Locrian", "Altered Scale"];
+        targetTones = `The b5 (${NOTES[fifthIdx]}) is your tension note. Lean into it.`;
+        beautiful = [`${root}dim7`, `${root}m7b5`, `${root}dim(maj7)`];
+        genre = "Creates extreme unresolved tension. Found heavily in Gospel turnarounds, Jazz, and classical hymns.";
+        bassIdea = "Play the root, or act as a passing chromatic tone. Don't linger.";
+        scaleFiguresText = `Half-Whole Diminished:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+1)%12]} - ${NOTES[(rootIdx+3)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+6)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]} - ${NOTES[(rootIdx+10)%12]}`;
+        
+        animatedScales.push({ name: "Half-Whole Dim", intervals: [0, 1, 3, 4, 6, 7, 9, 10] });
+        animatedScales.push({ name: "Locrian", intervals: [0, 1, 3, 5, 6, 8, 10] });
+        
+        pedalPoint = "Do not pedal. Move chromatically.";
+        passingChord = `Resolves upwards a half-step to ${NOTES[(rootIdx+1)%12]}.`;
+        patchRecipe = "Layer 1: Aggressive Synth Brass\nLayer 2: Distortion\nFilter: Wide Open";
+        organDrawbars = "88 8888 888";
+    } else {
+        // Major / Dominant
+        if (interval === 7 && isDom) {
+            roleName = "V (Dominant 7)";
+            roleDef = "Maximum forward motion. Creates tension that strongly craves resolution back to the I (Tonic).";
+            scaleIntervals = [0, 2, 4, 5, 7, 9, 10]; // Mixolydian
+            bassIntervals = [0, 4, 7, 10];
+            scalesList = ["Mixolydian", "Altered Scale", "Lydian Dominant", "Blues"];
+            targetTones = `The flat 7 (${NOTES[(rootIdx+10)%12]}) creates the dominant pull back to I.`;
+            beautiful = [`${root}7sus4`, `${root}9`, `${root}13`, `${root}7b9`, `${root}7#9`];
+            genre = "Maximum forward motion. Craves resolution back to the Tonic (Blues/Jazz/Gospel).";
+            bassIdea = "Walk the bass line down to the I chord, or pulse the dominant 5th.";
+            scaleFiguresText = `Mixolydian:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+5)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]} - ${NOTES[(rootIdx+10)%12]}\n\nMajor Pentatonic:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]}`;
+            toneSuggestion = "Edge of Breakup / Mid Overdrive";
+            strummingPattern = "D - D - D - D (Building 4ths)";
+            keysIdea = "• Main Mix: Punchy stabs on the upbeat to build energy.\n• Build tension by playing a V7sus4 and resolving to V before hitting the I.";
+            keysTone = "Classic Rhodes or Hammond B3";
+            pedalPoint = `Hold the Root (${NOTES[rootIdx]}) to build maximum dominant tension.`;
+            passingChord = `Approach with a ii7 (${NOTES[(rootIdx-5+12)%12]}m7) chord.`;
+            patchRecipe = "Layer 1: Grand Piano (Hard Velocity)\nLayer 2: Bright Synth Brass\nFX: Fast Leslie Spin";
+            organDrawbars = "88 8888 000";
+            
+            animatedScales.push({ name: "Mixolydian", intervals: [0, 2, 4, 5, 7, 9, 10] });
+            animatedScales.push({ name: "Major Blues", intervals: [0, 2, 3, 4, 7, 9] });
+            animatedScales.push({ name: "Altered (Jazz)", intervals: [0, 1, 3, 4, 6, 8, 10] });
+            animatedScales.push({ name: "Lydian Dominant", intervals: [0, 2, 4, 6, 7, 9, 10] });
+        } else if (interval === 5) { // IV
+            roleName = "IV (Subdominant)";
+            roleDef = "The classic worship 'lift'. Floaty and open, pulling gently back to the I or pushing to the V.";
+            scaleIntervals = [0, 2, 4, 6, 7, 9, 11]; // Lydian
+            bassIntervals = [0, 4, 7, 9];
+            scalesList = ["Lydian", "Major Pentatonic", "Ionian"];
+            targetTones = `The #4 (${NOTES[(rootIdx+6)%12]}) from Lydian creates an incredibly dreamy, floaty atmosphere.`;
+            beautiful = [`${root}maj7`, `${root}add9`, `${root}maj9`, `${root}sus2`, `${root}maj7#11`];
+            genre = "The classic worship 'lift'. Often used for big instrumental sections and soaring choruses.";
+            bassIdea = "Great place for higher register bass fills or melodic 10ths.";
+            scaleFiguresText = `Lydian:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+6)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]} - ${NOTES[(rootIdx+11)%12]}\n\nMajor Pentatonic:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]}`;
+            toneSuggestion = "Clean + Shimmer Reverb + Swells";
+            keysIdea = "• Main Mix: Play wide open arpeggios in the right hand for an atmospheric lift.";
+            pedalPoint = `Hold the 5th (${NOTES[(keyIdx+7)%12]}) of the key on top to float.`;
+            passingChord = `Approach with a I/III (${NOTES[keyIdx]}/${NOTES[(keyIdx+4)%12]}) passing chord.`;
+            patchRecipe = "Layer 1: Bright Grand Piano\nLayer 2: Massive Shimmer Pad\nArp: 1/16th notes UP (Soft)\nFX: 100% Wet Delay";
+            organDrawbars = "80 8800 000";
+            
+            animatedScales.push({ name: "Lydian", intervals: [0, 2, 4, 6, 7, 9, 11] });
+            animatedScales.push({ name: "Major Pentatonic", intervals: [0, 2, 4, 7, 9] });
+            animatedScales.push({ name: "Ionian (Major)", intervals: [0, 2, 4, 5, 7, 9, 11] });
+        } else { // I, V, or Borrowed
+            roleName = interval === 0 ? "I (Tonic)" : interval === 7 ? "V (Dominant Triad)" : "Major";
+            roleDef = interval === 0 ? "The home base. Provides complete resolution, triumph, and stability." : "A major chord that provides strong structural support and stability.";
+            scaleIntervals = [0, 2, 4, 5, 7, 9, 11]; // Ionian
+            bassIntervals = [0, 4, 7, 9];
+            scalesList = ["Ionian (Major)", "Major Pentatonic", "Lydian", "Blues"];
+            targetTones = `Resolve to the Root (${NOTES[rootIdx]}) or Major 3rd (${NOTES[thirdIdx]}). The 9th (${NOTES[(rootIdx+2)%12]}) adds a modern pop/worship shimmer.`;
+            beautiful = [`${root}maj7`, `${root}add9`, `${root}sus2`, `${root}6/9`, `${root}maj9`];
+            genre = "Home base or structural anchor. Provides complete resolution and triumphant clarity.";
+            bassIdea = "Solid, foundational root notes. Hold the low end down securely.";
+            scaleFiguresText = `Major (Ionian):\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+5)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]} - ${NOTES[(rootIdx+11)%12]}\n\nMajor Pentatonic:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]}\n\nMajor Blues:\n${NOTES[rootIdx]} - ${NOTES[(rootIdx+2)%12]} - ${NOTES[(rootIdx+3)%12]} - ${NOTES[(rootIdx+4)%12]} - ${NOTES[(rootIdx+7)%12]} - ${NOTES[(rootIdx+9)%12]}`;
+            strummingPattern = "D - D U - U D U (Classic Pop)";
+            keysIdea = "• Main Mix: Play solid blocks or big rhythmic pulses.\n• Anchor the progression heavily.";
+            pedalPoint = `Hold the Root (${NOTES[rootIdx]}) as an anchor for the whole section.`;
+            passingChord = `Approach with a V7 (${NOTES[(rootIdx+7)%12]}7) or IV/I chord.`;
+            patchRecipe = "Layer 1: Grand Piano (Full EQ)\nLayer 2: Subtle Saw Pad (Sidechained)\nCompression: Fast Attack";
+            organDrawbars = "88 8888 000";
+            
+            animatedScales.push({ name: "Ionian (Major)", intervals: [0, 2, 4, 5, 7, 9, 11] });
+            animatedScales.push({ name: "Major Pentatonic", intervals: [0, 2, 4, 7, 9] });
+            animatedScales.push({ name: "Major Blues", intervals: [0, 2, 3, 4, 7, 9] });
+            animatedScales.push({ name: "Bebop Major", intervals: [0, 2, 4, 5, 7, 8, 9, 11] });
+        }
+    }
+
+    return {
+        notes: notes,
+        pianoInversions: pianoInversions,
+        role: roleName,
+        roleDefinition: roleDef,
+        scales: scalesList,
+        scaleIntervals: scaleIntervals,
+        bassIntervals: bassIntervals,
+        targetTones: targetTones,
+        bassIdea: bassIdea,
+        beautiful: beautiful,
+        genre: genre,
+        isMinor: isMinor,
+        scaleFiguresText: scaleFiguresText,
+        guitarIdea: guitarIdea,
+        capoOptions: capoOptions,
+        pickingPattern: pickingPattern,
+        strummingPattern: strummingPattern,
+        toneSuggestion: toneSuggestion,
+        keysIdea: keysIdea,
+        keysLeftHandWithBass: keysLeftHandWithBass,
+        keysLeftHandNoBass: keysLeftHandNoBass,
+        pedalPoint: pedalPoint,
+        passingChord: passingChord,
+        patchRecipe: patchRecipe,
+        organDrawbars: organDrawbars,
+        openTenthNotes: openTenthNotes,
+        keysExtensions: keysExtensions,
+        animatedScales: animatedScales
+    };
+}
+
+window.renderPianoSVG = function(absoluteNotes, title, scale = 1, isStandalone = true, delayMs = 150) {
+    // Dynamically calculate the required width to ensure notes are never cut off. 
+    // We force at least 2 octaves (24 notes), but expand if 10th voicings or scales go higher.
+    let maxNote = absoluteNotes.length > 0 ? Math.max(...absoluteNotes) : 24;
+    let numOctaves = Math.max(2, Math.ceil((maxNote + 2) / 12)); 
+    
+    let whiteKeys = [];
+    let blackKeyOffsets = [];
+    
+    const wPattern = [0, 2, 4, 5, 7, 9, 11];
+    const bPattern = [1, 3, -1, 6, 8, 10, -1];
+    
+    for (let o = 0; o < numOctaves; o++) {
+        wPattern.forEach(n => whiteKeys.push(n + (o * 12)));
+        bPattern.forEach(n => blackKeyOffsets.push(n === -1 ? -1 : n + (o * 12)));
+    }
+    // Cap off the keyboard with a final C
+    whiteKeys.push(numOctaves * 12);
+    blackKeyOffsets.push(-1);
+
+    let w = 24; 
+    let h = 85; 
+    let rx = 2; 
+    let totalW = whiteKeys.length * w;
+    let scaledW = totalW * scale;
+    
+    let svg = '';
+    
+    if (isStandalone) {
+        let maxWidth = scaledW + 40;
+        svg += `<div class="flex flex-col items-center snap-center shrink-0 bg-black/30 p-4 sm:p-5 rounded-2xl border border-indigo-500/20 relative shadow-inner" style="width: ${maxWidth}px; max-width: 100%; flex: 0 0 auto;">`;
+        if (title) svg += `<span class="text-[10px] sm:text-xs text-indigo-300 font-extrabold mb-4 uppercase tracking-widest text-center w-full block">${title}</span>`;
+    }
+
+    svg += `<svg viewBox="0 0 ${totalW} ${h}" style="width: 100%; max-width: ${scaledW}px; height: auto; aspect-ratio: ${totalW} / ${h}; display: block; margin: 0 auto;" class="rounded-md shadow-[0_6px_20px_rgba(0,0,0,0.6)] border border-indigo-900/50 select-none">`;
+    
+    // Draw all white keys first
+    whiteKeys.forEach((noteAbs, i) => {
+        let isActive = absoluteNotes.includes(noteAbs);
+        let noteIndexInChord = absoluteNotes.indexOf(noteAbs);
+        let delay = noteIndexInChord !== -1 ? noteIndexInChord * delayMs : 0;
+        
+        let fill = isActive ? '#c7d2fe' : '#f8fafc'; 
+        let stroke = isActive ? '#6366f1' : '#334155'; 
+        let animClass = isActive ? 'play-key-white' : '';
+        let animStyle = isActive ? `style="animation-delay: ${delay}ms;"` : '';
+        
+        svg += `<rect x="${i * w}" y="0" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" class="${animClass}" ${animStyle}/>`;
+    });
+    
+    blackKeyOffsets.forEach((noteAbs, i) => {
+        if (noteAbs !== -1) {
+            let isActive = absoluteNotes.includes(noteAbs);
+            let noteIndexInChord = absoluteNotes.indexOf(noteAbs);
+            let delay = noteIndexInChord !== -1 ? noteIndexInChord * delayMs : 0;
+            
+            let fill = isActive ? '#4f46e5' : '#0f172a'; 
+            let stroke = isActive ? '#818cf8' : '#000000'; 
+            let animClass = isActive ? 'play-key-black' : '';
+            let animStyle = isActive ? `style="animation-delay: ${delay}ms;"` : '';
+            
+            svg += `<rect x="${(i + 1) * w - (w * 0.35)}" y="0" width="${w * 0.7}" height="${h * 0.6}" fill="${fill}" stroke="${stroke}" stroke-width="2" rx="${rx}" class="${animClass}" ${animStyle}/>`;
+        }
+    });
+    
+    svg += `</svg>`;
+    
+    if (isStandalone) {
+        svg += `</div>`;
+    }
+    
+    return svg;
+}
+
+window.showChordTooltip = function(event, chordName, songKey = currentKey) {
     event.stopPropagation();
     
     let cleanChord = chordName.split('/')[0].trim();
-    cleanChord = cleanChord.replace(/(maj7|min7|maj|dim|m7|7|sus4|sus2|add9)/i, match => {
-        return match.toLowerCase().startsWith('m') ? 'm' : '';
+    
+    let match = cleanChord.match(/^([A-G][#b]?)(.*)/i);
+    let root = match ? match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase() : 'C';
+    let quality = match ? match[2] : '';
+
+    let diagramChord = cleanChord.replace(/(maj7|min7|maj|dim|m7|7|sus4|sus2|add9)/i, m => {
+        return m.toLowerCase().startsWith('m') ? 'm' : '';
     });
 
-    const tooltip = document.getElementById('chordTooltip');
     const nameEl = document.getElementById('tooltipChordName');
+    const roleEl = document.getElementById('tooltipChordRole');
+    const defEl = document.getElementById('tooltipRoleDefinition');
     const fretboardEl = document.getElementById('tooltipFretboard');
+    const keyBadgeEl = document.getElementById('tooltipSongKey');
     
     if(nameEl) nameEl.innerText = chordName;
+    if(keyBadgeEl) keyBadgeEl.innerHTML = `<span class="text-sky-400">🔑</span> Key: ${songKey}`;
 
-    let fingering = GUITAR_DIAGRAMS[cleanChord];
+    const theory = window.getChordTheoryData(root, quality, songKey);
+    if (theory) {
+        if (roleEl) roleEl.innerText = theory.role;
+        if (defEl) {
+            defEl.innerText = theory.roleDefinition;
+            defEl.classList.remove('hidden');
+        }
+        
+        // Guitar Population
+        const capoEl = document.getElementById('tooltipGuitarCapo');
+        if (capoEl) {
+            if (theory.capoOptions.length > 0) {
+                capoEl.innerHTML = theory.capoOptions.join('');
+            } else {
+                capoEl.innerHTML = `<span class="text-[9px] text-gray-500 italic">No standard open capo shapes (Key of C/G)</span>`;
+            }
+        }
+        const guitarTriadsEl = document.getElementById('tooltipGuitarTriads');
+        if (guitarTriadsEl) guitarTriadsEl.innerHTML = window.generateGuitarTriads(NOTE_TO_INDEX[root], theory.isMinor);
+        const guitarMovableEl = document.getElementById('tooltipGuitarMovable');
+        if (guitarMovableEl) guitarMovableEl.innerHTML = window.generateMovableShapes(NOTE_TO_INDEX[root], theory.isMinor);
+        const powerEl = document.getElementById('tooltipGuitarPower');
+        if (powerEl) powerEl.innerHTML = window.generatePowerChords(NOTE_TO_INDEX[root]);
+        const ambientEl = document.getElementById('tooltipGuitarAmbient');
+        if (ambientEl) ambientEl.innerHTML = window.generateAmbientVoicings(NOTE_TO_INDEX[root], theory.isMinor);
+        const guitarInstEl = document.getElementById('tooltipGuitarInstructions');
+        if (guitarInstEl) guitarInstEl.innerText = theory.guitarIdea;
+        const pickingEl = document.getElementById('tooltipGuitarPicking');
+        if (pickingEl) {
+            pickingEl.innerHTML = `
+                <div class="mb-1.5"><span class="text-indigo-400 font-bold">Pick:</span> ${theory.pickingPattern}</div>
+                <div class="mb-1.5"><span class="text-indigo-400 font-bold">Strum:</span> ${theory.strummingPattern}</div>
+                <div><span class="text-indigo-400 font-bold">Tone:</span> ${theory.toneSuggestion}</div>
+            `;
+        }
+        
+        // --- KEYS TAB POPULATION ---
+        const keysRootEl = document.getElementById('tooltipKeysRoot');
+        if (keysRootEl) keysRootEl.innerHTML = window.renderPianoSVG(theory.pianoInversions[0].notes, '', 1.1, false);
+
+        const keysTenthEl = document.getElementById('tooltipKeysTenth');
+        if (keysTenthEl) {
+            keysTenthEl.innerHTML = window.renderPianoSVG(theory.openTenthNotes, '', 1, false, 250);
+        }
+        
+        const keysInstEl = document.getElementById('tooltipKeysInstructions');
+        if (keysInstEl) keysInstEl.innerText = theory.keysIdea;
+
+        const keysPlayingEl = document.getElementById('tooltipKeysPlaying');
+        if (keysPlayingEl) {
+            keysPlayingEl.innerHTML = `
+                <div class="mb-2"><span class="text-indigo-400 font-bold">With Bassist:</span> ${theory.keysLeftHandWithBass}</div>
+                <div class="mb-2"><span class="text-indigo-400 font-bold">No Bassist:</span> ${theory.keysLeftHandNoBass}</div>
+                <div class="mb-2"><span class="text-emerald-400 font-bold">Pedal:</span> ${theory.pedalPoint}</div>
+                <div><span class="text-rose-400 font-bold">Passing:</span> ${theory.passingChord}</div>
+            `;
+        }
+
+        const keysPatchEl = document.getElementById('tooltipKeysPatch');
+        if (keysPatchEl) keysPatchEl.innerText = theory.patchRecipe;
+
+        const keysOrganEl = document.getElementById('tooltipKeysOrgan');
+        if (keysOrganEl) keysOrganEl.innerText = theory.organDrawbars;
+
+        const pianoEl = document.getElementById('tooltipPianoInversions');
+        if (pianoEl) pianoEl.innerHTML = theory.pianoInversions.map(inv => window.renderPianoSVG(inv.notes, inv.name, 0.9)).join('');
+        
+        const keysExtEl = document.getElementById('tooltipKeysExtensions');
+        if (keysExtEl) keysExtEl.innerHTML = theory.keysExtensions.map(ext => window.renderPianoSVG(ext.notes, ext.name, 0.9)).join('');
+
+        const keysScalesEl = document.getElementById('tooltipKeysScales');
+        if (keysScalesEl) keysScalesEl.innerText = theory.scaleFiguresText;
+
+        const keysScalesSvgEl = document.getElementById('tooltipKeysScalesSVG');
+        if (keysScalesSvgEl) {
+            let svgHtml = '';
+            theory.animatedScales.forEach(scale => {
+                let notes = [];
+                for(let i=0; i<=24; i++) {
+                    if (scale.intervals.includes((i - NOTE_TO_INDEX[root] + 24) % 12)) notes.push(i);
+                }
+                notes.sort((a, b) => a - b);
+                svgHtml += window.renderPianoSVG(notes, scale.name, 0.85, true, 80);
+            });
+            keysScalesSvgEl.innerHTML = svgHtml;
+        }
+
+        // Bass Population
+        const bassFret = document.getElementById('tooltipBassFretboard');
+        const rootOffsetE = (NOTE_TO_INDEX[root] - 4 + 12) % 12; 
+        const bassBoxes = [
+            { name: "Low Pos", minFret: rootOffsetE === 0 ? 1 : rootOffsetE - 1, span: 5 },
+            { name: "Mid Pos", minFret: rootOffsetE + 4, span: 5 }
+        ];
+        if (bassFret) bassFret.innerHTML = window.generateScaleBoxes(NOTE_TO_INDEX[root], theory.bassIntervals, 4, bassBoxes);
+        const bassNotesEl = document.getElementById('tooltipBassNotes');
+        if (bassNotesEl) bassNotesEl.innerText = theory.bassIdea; 
+        const bassGrooveEl = document.getElementById('tooltipBassGroove');
+        if (bassGrooveEl) bassGrooveEl.innerText = "Idea: " + theory.bassIdea + "\n\nRhythm: " + theory.genre;
+
+        // Lead Population
+        const leadFret = document.getElementById('tooltipLeadFretboard');
+        const leadBoxes = [
+            { name: "Zone 1 (Low)", minFret: 1, span: 5 },
+            { name: "Zone 2 (Mid)", minFret: 5, span: 5 },
+            { name: "Zone 3 (High)", minFret: 9, span: 5 },
+            { name: "Zone 4 (Lead)", minFret: 12, span: 5 }
+        ];
+        if (leadFret) leadFret.innerHTML = window.generateScaleBoxes(NOTE_TO_INDEX[root], theory.scaleIntervals, 6, leadBoxes);
+        const scalesEl = document.getElementById('tooltipLeadScale');
+        if (scalesEl) scalesEl.innerHTML = theory.scales.map(s => `<span class="inline-block bg-indigo-500/20 text-indigo-100 border border-indigo-500/30 px-2.5 py-1.5 rounded text-[9px] sm:text-[10px] shadow-sm font-semibold">${s}</span>`).join('');
+        const leadTonesEl = document.getElementById('tooltipLeadTones');
+        if (leadTonesEl) leadTonesEl.innerText = theory.targetTones;
+        const beautifulEl = document.getElementById('tooltipBeautifulChords');
+        if (beautifulEl) beautifulEl.innerHTML = theory.beautiful.map(c => `<span class="bg-indigo-600 text-white border border-indigo-400 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold font-mono shadow-sm cursor-help hover:bg-indigo-50 hover:scale-105 hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">${c}</span>`).join('');
+        const genreEl = document.getElementById('tooltipGenre');
+        if (genreEl) genreEl.innerText = theory.genre;
+    }
+
+    window.switchChordTab('keys');
+
+    let fingering = GUITAR_DIAGRAMS[diagramChord];
     if (!fingering) {
         if (cleanChord.startsWith('Db')) fingering = GUITAR_DIAGRAMS['C#m'];
         else if (cleanChord.startsWith('Eb')) fingering = GUITAR_DIAGRAMS['D#m'];
@@ -1428,69 +2565,73 @@ window.showChordTooltip = function(event, chordName) {
     }
     
     if (!fingering) {
-        if(fretboardEl) fretboardEl.innerHTML = `<div class="text-[9px] text-gray-500 py-3 text-center select-none">Fingering shape not found for standard catalog</div>`;
+        if (fretboardEl) fretboardEl.innerHTML = `<div class="text-xs text-indigo-200/50 py-6 text-center select-none italic border border-dashed border-indigo-500/20 w-full rounded-xl mt-2">Fingering shape not found for catalog</div>`;
     } else {
         let circles = '';
         let markers = '';
-        const stringX = [20, 44, 68, 92, 116, 140];
+        const stringX = [25, 60, 95, 130, 165, 200];
         
         fingering.forEach((fret, stringIdx) => {
             const x = stringX[stringIdx];
+            let delay = stringIdx * 60;
+            
             if (fret === -1) {
-                markers += `<text x="${x - 4}" y="12" fill="#ef4444" font-size="10" font-family="monospace">X</text>`;
+                markers += `<g class="strum-note" style="animation-delay: ${delay}ms; transform-origin: ${x}px 16px;">
+                                <text x="${x - 6}" y="16" fill="#ef4444" font-size="14" font-family="monospace" font-weight="bold">X</text>
+                            </g>`;
             } else if (fret === 0) {
-                markers += `<circle cx="${x}" cy="10" r="3.5" fill="none" stroke="#10b981" stroke-width="1.5"></circle>`;
+                markers += `<g class="strum-note" style="animation-delay: ${delay}ms; transform-origin: ${x}px 12px;">
+                                <circle cx="${x}" cy="12" r="5" fill="none" stroke="#10b981" stroke-width="2"></circle>
+                            </g>`;
             } else {
-                const y = 15 + (fret * 20) - 10;
-                circles += `<circle cx="${x}" cy="${y}" r="6" fill="#6366f1" stroke="#818cf8" stroke-width="1"></circle>`;
-                circles += `<text x="${x - 2}" y="${y + 3}" fill="#ffffff" font-size="7" font-weight="bold">${fret}</text>`;
+                const y = 20 + (fret * 28) - 14;
+                circles += `<g class="strum-note" style="animation-delay: ${delay}ms; transform-origin: ${x}px ${y}px;">
+                                <circle cx="${x}" cy="${y}" r="11" fill="#4f46e5" stroke="#818cf8" stroke-width="1.5"></circle>
+                                <text x="${x}" y="${y + 4}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">${fret}</text>
+                            </g>`;
             }
         });
 
-        if(fretboardEl) fretboardEl.innerHTML = `
-            <svg width="160" height="130" class="select-none font-mono">
-                <line x1="20" y1="18" x2="140" y2="18" stroke="#ffffff" stroke-width="3"></line>
-                <line x1="20" y1="38" x2="140" y2="38" stroke="#4b5563" stroke-width="1"></line>
-                <line x1="20" y1="58" x2="140" y2="58" stroke="#4b5563" stroke-width="1"></line>
-                <line x1="20" y1="78" x2="140" y2="78" stroke="#4b5563" stroke-width="1"></line>
-                <line x1="20" y1="98" x2="140" y2="98" stroke="#4b5563" stroke-width="1"></line>
-                <line x1="20" y1="118" x2="140" y2="118" stroke="#4b5563" stroke-width="1"></line>
-                <line x1="20" y1="18" x2="20" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
-                <line x1="44" y1="18" x2="44" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
-                <line x1="68" y1="18" x2="68" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
-                <line x1="92" y1="18" x2="92" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
-                <line x1="116" y1="18" x2="116" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
-                <line x1="140" y1="18" x2="140" y2="118" stroke="#6b7280" stroke-width="1.5"></line>
+        if (fretboardEl) fretboardEl.innerHTML = `
+            <svg viewBox="0 0 225 190" style="width: 100%; height: auto; aspect-ratio: 225 / 190; display: block;" class="select-none font-mono mt-2">
+                <line x1="25" y1="20" x2="200" y2="20" stroke="#ffffff" stroke-width="4"></line>
+                <line x1="25" y1="48" x2="200" y2="48" stroke="#6366f1" stroke-opacity="0.5" stroke-width="1.5"></line>
+                <line x1="25" y1="76" x2="200" y2="76" stroke="#6366f1" stroke-opacity="0.5" stroke-width="1.5"></line>
+                <line x1="25" y1="104" x2="200" y2="104" stroke="#6366f1" stroke-opacity="0.5" stroke-width="1.5"></line>
+                <line x1="25" y1="132" x2="200" y2="132" stroke="#6366f1" stroke-opacity="0.5" stroke-width="1.5"></line>
+                <line x1="25" y1="160" x2="200" y2="160" stroke="#6366f1" stroke-opacity="0.5" stroke-width="1.5"></line>
+                <line x1="25" y1="20" x2="25" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
+                <line x1="60" y1="20" x2="60" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
+                <line x1="95" y1="20" x2="95" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
+                <line x1="130" y1="20" x2="130" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
+                <line x1="165" y1="20" x2="165" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
+                <line x1="200" y1="20" x2="200" y2="160" stroke="#818cf8" stroke-opacity="0.8" stroke-width="2"></line>
                 ${markers}
                 ${circles}
             </svg>`;
     }
 
-    if(tooltip) {
-        const rect = event.target.getBoundingClientRect();
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        let targetLeft = rect.left + scrollLeft - 60;
-        if (targetLeft < 10) targetLeft = 10;
-        if (targetLeft + 180 > window.innerWidth) targetLeft = window.innerWidth - 190;
-        
-        tooltip.style.left = `${targetLeft}px`;
-        tooltip.style.top = `${rect.top + scrollTop - 165}px`;
-        tooltip.classList.remove('hidden');
+    const wrap = document.getElementById('chordModalWrap');
+    if (wrap) {
+        if (document.fullscreenElement && document.fullscreenElement.id === 'lyricsFullscreenWrap') {
+            document.fullscreenElement.appendChild(wrap);
+        } else {
+            document.body.appendChild(wrap);
+        }
+        wrap.classList.remove('modal-hidden');
     }
 }
 
 window.hideChordTooltip = function() {
-    const tt = document.getElementById('chordTooltip');
-    if(tt) tt.classList.add('hidden');
+    const wrap = document.getElementById('chordModalWrap');
+    if(wrap) wrap.classList.add('modal-hidden');
 }
 
-window.makeChordsClickable = function(transposedLine) {
+window.makeChordsClickable = function(transposedLine, blockKeyName) {
     if (!transposedLine) return '';
     return transposedLine.split(/(\s+|-)/).map(part => {
         if (part.trim() && !part.includes('-')) {
-            return `<span class="hover:text-amber-300 hover:underline cursor-help transition-all duration-150 inline-block px-0.5 active:scale-110" onclick="window.showChordTooltip(event, '${part.trim()}')">${part}</span>`;
+            return `<span class="hover:text-sky-300 hover:underline cursor-help transition-all duration-150 inline-block px-0.5 active:scale-110" onclick="window.showChordTooltip(event, '${part.trim()}', '${blockKeyName || currentKey}')">${part}</span>`;
         }
         return part;
     }).join('');
@@ -1566,7 +2707,6 @@ window.shiftRoadmap = function(index, direction) {
     window.showToast("Arrangement sequence updated!", "success");
 }
 
-// --- Drag & Drop Roadmap Engine ---
 window.handleDragStart = function(e, idx) {
     draggedBlockIndex = idx;
     e.dataTransfer.effectAllowed = 'move';
@@ -1575,19 +2715,15 @@ window.handleDragStart = function(e, idx) {
     }, 10);
 };
 
-window.handleDragOver = function(e) {
-    e.preventDefault(); 
-};
+window.handleDragOver = function(e) { e.preventDefault(); };
 
 window.handleDragEnter = function(e) {
     e.preventDefault();
-    let target = e.currentTarget;
-    target.classList.add('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
+    e.currentTarget.classList.add('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
 };
 
 window.handleDragLeave = function(e) {
-    let target = e.currentTarget;
-    target.classList.remove('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
+    e.currentTarget.classList.remove('border-indigo-400', 'bg-indigo-600/30', '-translate-y-1', 'shadow-[0_0_15px_rgba(99,102,241,0.4)]');
 };
 
 window.handleDrop = function(e, targetIndex) {
@@ -1607,7 +2743,6 @@ window.handleDragEnd = function(e) {
     e.target.classList.remove('opacity-40', 'border-dashed', 'scale-95');
     draggedBlockIndex = null;
 };
-// ----------------------------------
 
 window.deleteRoadmap = function(index) {
     if (activeRoadmap.length <= 1) {
@@ -1931,8 +3066,15 @@ window.toggleAutoScroll = function() {
                 : document.body.offsetHeight - window.innerHeight;
 
             if (Math.ceil(currentScroll) >= maxScroll - 2) {
-                window.toggleAutoScroll();
-                return;
+                if (!targetEl.dataset.atBottomFrames) targetEl.dataset.atBottomFrames = 0;
+                targetEl.dataset.atBottomFrames++;
+                if (targetEl.dataset.atBottomFrames > 10) {
+                    window.toggleAutoScroll();
+                    delete targetEl.dataset.atBottomFrames;
+                    return;
+                }
+            } else {
+                delete targetEl.dataset.atBottomFrames;
             }
             
             scrollAnimationId = requestAnimationFrame(step);
@@ -2468,66 +3610,65 @@ window.renderSong = function() {
         const performanceToolbarHTML = `
         <div id="collapsibleControls" class="panel-wrap ${controlsExpanded ? 'is-open' : ''}">
             <div class="panel-inner">
-                <div class="pt-2 pb-1">
-                    <!-- Unified Ultra-Dense Performance Toolbar (Balanced Full-Width) -->
-                    <div class="flex flex-wrap items-center justify-center lg:justify-between w-full gap-x-3 gap-y-2 py-1.5 px-2.5 sm:px-3 bg-indigo-950/20 rounded-xl border border-indigo-500/20 shadow-sm">
+                <div class="pt-1 pb-1.5">
+                    <!-- Ultra-Squeezed Mobile Toolbar / Balanced Desktop Toolbar -->
+                    <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center lg:justify-between w-full gap-1.5 sm:gap-x-3 sm:gap-y-2 p-1.5 sm:px-3 bg-indigo-950/20 rounded-xl border border-indigo-500/20 shadow-sm">
                         
-                        <!-- Transpose Control -->
-                        <div class="flex items-center gap-1">
-                            <button onclick="window.shiftKey(-1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">-</button>
-                            <span class="w-8 text-center text-[10px] font-bold text-amber-400 font-mono">${currentKey}</span>
-                            <button onclick="window.shiftKey(1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-sm text-indigo-300 transition-all">+</button>
+                        <!-- Row 1 Mobile: Transpose & Zoom -->
+                        <div class="flex items-center justify-between sm:justify-start gap-1 sm:gap-3 w-full sm:w-auto">
+                            <!-- Transpose -->
+                            <div class="flex items-center gap-0.5 sm:gap-1 bg-black/20 sm:bg-transparent rounded-lg px-1 py-0.5 sm:p-0">
+                                <button onclick="window.shiftKey(-1)" class="w-5 h-5 sm:w-7 sm:h-7 rounded-md bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-xs sm:text-sm text-indigo-300 transition-all">-</button>
+                                <span class="w-6 sm:w-8 text-center text-[10px] font-bold text-amber-400 font-mono">${currentKey}</span>
+                                <button onclick="window.shiftKey(1)" class="w-5 h-5 sm:w-7 sm:h-7 rounded-md bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center font-bold text-xs sm:text-sm text-indigo-300 transition-all">+</button>
+                            </div>
+                            
+                            <div class="hidden sm:block w-[1px] h-5 bg-white/10"></div>
+                            
+                            <!-- Zoom -->
+                            <div class="flex items-center gap-0.5 sm:gap-1 bg-black/20 sm:bg-transparent rounded-lg px-1 py-0.5 sm:p-0">
+                                <button onclick="window.adjustZoom(-0.1)" class="w-5 h-5 sm:w-7 sm:h-7 rounded-md bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[9px] sm:text-[10px] text-gray-300 active:scale-95 transition-all">A-</button>
+                                <button onclick="window.adjustZoom(0.1)" class="w-5 h-5 sm:w-7 sm:h-7 rounded-md bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[9px] sm:text-[10px] text-gray-300 active:scale-95 transition-all">A+</button>
+                            </div>
                         </div>
                         
-                        <!-- Separator -->
-                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+                        <div class="hidden sm:block w-[1px] h-5 bg-white/10"></div>
                         
                         <!-- Display Mode Select -->
-                        <div class="flex items-center">
-                            <select onchange="displayMode=this.value; window.renderSong()" class="bg-black/30 text-[10px] py-1 px-2.5 rounded-lg text-gray-200 outline-none shadow-inner border border-white/5 transition-all appearance-none cursor-pointer text-center hover:bg-black/50 focus:ring-1 focus:ring-indigo-500/50">
-                                <option value="chords" ${displayMode==='chords'?'selected':''}>Chords Only</option>
-                                <option value="numbers" ${displayMode==='numbers'?'selected':''}>Numbers Only</option>
-                                <option value="both" ${displayMode==='both'?'selected':''}>Chords & Numbers</option>
-                            </select>
-                        </div>
+                        <select onchange="displayMode=this.value; window.renderSong()" class="bg-black/30 text-[9px] sm:text-[10px] py-1.5 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-gray-200 outline-none shadow-inner border border-white/5 transition-all appearance-none cursor-pointer text-center hover:bg-black/50 focus:ring-1 focus:ring-indigo-500/50 w-full sm:w-auto">
+                            <option value="chords" ${displayMode==='chords'?'selected':''}>Chords Only</option>
+                            <option value="numbers" ${displayMode==='numbers'?'selected':''}>Numbers Only</option>
+                            <option value="both" ${displayMode==='both'?'selected':''}>Chords & Numbers</option>
+                        </select>
                         
-                        <!-- Separator -->
-                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
-                        
-                        <!-- Zoom Font Size Control -->
-                        <div class="flex items-center gap-1">
-                            <button onclick="window.adjustZoom(-0.1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[10px] text-gray-300 active:scale-95 transition-all">A-</button>
-                            <button onclick="window.adjustZoom(0.1)" class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center font-bold text-[10px] text-gray-300 active:scale-95 transition-all">A+</button>
-                        </div>
+                        <div class="hidden sm:block w-[1px] h-5 bg-white/10"></div>
 
-                        <!-- Separator -->
-                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
+                        <!-- Autoscroll & Metro Wrapper -->
+                        <div class="flex flex-col sm:flex-row gap-1.5 sm:gap-3 w-full sm:w-auto">
+                            <!-- Scroll -->
+                            <div class="flex items-center gap-1.5 sm:gap-2 bg-black/20 sm:bg-transparent rounded-lg p-1 sm:p-0">
+                                <button id="autoScrollBtn" onclick="window.toggleAutoScroll()" class="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-all flex items-center gap-1 active:scale-95 shadow-sm whitespace-nowrap">
+                                    <svg id="scrollIcon" class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                    <span id="scrollBtnText">Scroll</span>
+                                </button>
+                                <input type="range" id="scrollSpeedSlider" min="0.1" max="20" step="0.01" value="${scrollSpeed}" oninput="window.adjustScrollSpeed(this.value)" class="flex-1 sm:w-28 accent-indigo-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                            </div>
 
-                        <!-- Autoscroll & Speed -->
-                        <div class="flex items-center gap-2">
-                            <button id="autoScrollBtn" onclick="window.toggleAutoScroll()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm">
-                                <svg id="scrollIcon" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                                <span id="scrollBtnText">Scroll</span>
-                            </button>
-                            <div class="relative flex items-center">
-                                <input type="range" id="scrollSpeedSlider" min="0.1" max="20" step="0.01" value="${scrollSpeed}" oninput="window.adjustScrollSpeed(this.value)" class="w-20 sm:w-28 accent-indigo-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                            <div class="hidden sm:block w-[1px] h-5 bg-white/10"></div>
+
+                            <!-- Metronome & Tap Tempo -->
+                            <div class="flex items-center justify-between sm:justify-start gap-1 bg-black/20 sm:bg-transparent rounded-lg p-1 sm:p-0">
+                                <button id="metronomeBtn" onclick="window.toggleMetronome()" class="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-1 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-1 active:scale-95 border border-white/5 shadow-sm whitespace-nowrap">
+                                    <span id="metronomeDot" class="w-1.5 h-1.5 rounded-full bg-rose-500 opacity-20 scale-90 transition-all duration-100"></span>
+                                    Metro
+                                </button>
+                                <button onclick="window.tapTempo()" class="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-1.5 sm:py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all active:scale-95 border border-rose-500/20 shadow-sm">
+                                    TAP
+                                </button>
+                                <input type="number" id="metronomeBpm" min="40" max="250" value="${bpm}" onchange="window.updateBpm(this.value)" oninput="window.updateBpm(this.value)" class="w-10 sm:w-12 bg-black/40 text-center rounded-md p-1 text-[9px] sm:text-[10px] font-mono font-bold text-rose-300 outline-none focus:ring-1 focus:ring-rose-500/30 border border-white/5 shadow-inner">
                             </div>
                         </div>
 
-                        <!-- Separator -->
-                        <div class="hidden lg:block w-[1px] h-5 bg-white/10"></div>
-
-                        <!-- Metronome & Tap Tempo -->
-                        <div class="flex items-center gap-1">
-                            <button id="metronomeBtn" onclick="window.toggleMetronome()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-1 active:scale-95 border border-white/5 shadow-sm">
-                                <span id="metronomeDot" class="w-1.5 h-1.5 rounded-full bg-rose-500 opacity-20 scale-90 transition-all duration-100"></span>
-                                Metro
-                            </button>
-                            <button onclick="window.tapTempo()" class="text-[9px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-all active:scale-95 border border-rose-500/20 shadow-sm">
-                                TAP
-                            </button>
-                            <input type="number" id="metronomeBpm" min="40" max="250" value="${bpm}" onchange="window.updateBpm(this.value)" oninput="window.updateBpm(this.value)" class="w-12 bg-black/40 text-center rounded-md p-1 text-[10px] font-mono font-bold text-rose-300 outline-none focus:ring-1 focus:ring-rose-500/30 border border-white/5 shadow-inner">
-                        </div>
                     </div>
                 </div>
             </div>
@@ -2539,39 +3680,37 @@ window.renderSong = function() {
             appView.innerHTML = `
             <div class="p-2.5 sm:p-3 md:p-4 bg-gradient-to-br from-indigo-950/40 via-[#0a0b16]/60 to-[#05060a]/80 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-indigo-500/20 transition-all flex flex-col" style="max-height: calc(100vh - 65px);">
                 <div class="flex-shrink-0">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        
-                        <!-- Title, Artist & Star/Setlist Buttons -->
-                        <div class="flex-1 min-w-0 w-full sm:w-auto flex flex-col">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h2 class="text-lg sm:text-xl font-bold tracking-tight text-white select-none leading-none truncate max-w-full">${currentSong.Title}</h2>
-                                <div class="flex items-center gap-1 flex-shrink-0">
-                                    <button onclick="window.toggleFav('${currentSong.SongID}')" class="px-2 py-0.5 rounded text-[9px] btn-5d transition-all ${isFav?'text-amber-400 font-bold border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
+                    
+                    <!-- Streamlined Header Flex Layout -->
+                    <div class="flex justify-between items-start gap-4 w-full">
+                        <!-- TITLE, FAV, SET, ARTIST -->
+                        <div class="flex-1 min-w-0 flex flex-col pt-1">
+                            <div class="flex items-center gap-2 sm:gap-3 w-full">
+                                <h2 class="text-base sm:text-xl font-bold tracking-tight text-white select-none leading-none truncate shrink min-w-0">${currentSong.Title}</h2>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button onclick="window.toggleFav('${currentSong.SongID}')" class="px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[9px] btn-5d transition-all ${isFav?'text-amber-400 font-bold border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
                                         ${isFav?'★ Fav':'☆ Fav'}
                                     </button>
-                                    <button onclick="window.toggleSetlist('${currentSong.SongID}')" class="px-2 py-0.5 rounded text-[9px] btn-5d transition-all ${inSet?'text-violet-400 font-bold border-violet-500/40 shadow-[0_0_10px_rgba(139,92,246,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
+                                    <button onclick="window.toggleSetlist('${currentSong.SongID}')" class="px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[9px] btn-5d transition-all ${inSet?'text-violet-400 font-bold border-violet-500/40 shadow-[0_0_10px_rgba(139,92,246,0.15)]':'text-gray-400 hover:text-white'} active:scale-95 flex items-center gap-1">
                                         ${inSet?'⚡ Set':'☆ Set'}
                                     </button>
                                 </div>
                             </div>
-                            <p class="text-[9px] text-indigo-300/80 font-medium select-none truncate mt-0.5">${currentSong.Artist || 'Unknown Artist'}</p>
+                            <p class="text-[9px] text-indigo-300/80 font-medium select-none truncate mt-1.5">${currentSong.Artist || 'Unknown Artist'}</p>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto mt-1 sm:mt-0 flex-shrink-0">
-                            <button id="controlsToggleBtn" onclick="window.toggleControlPanel()" class="flex-1 sm:flex-none justify-center px-2 py-1 rounded text-[9px] btn-5d text-indigo-300 font-bold flex items-center gap-1">
-                                ${controlsExpanded ? '<span>▲</span> Hide Tools' : '<span>▼</span> Show Tools'}
-                            </button>
-                            ${(appUser && appSecret) ? `
-                            <button onclick="window.editSong('${currentSong.SongID}')" class="flex-1 sm:flex-none justify-center px-2 py-1 rounded text-[9px] btn-5d-primary text-white font-bold flex items-center gap-1">
+                        <!-- EDIT BUTTON -->
+                        ${(appUser && appSecret) ? `
+                        <div class="flex-shrink-0 mt-1">
+                            <button onclick="window.editSong('${currentSong.SongID}')" class="justify-center px-2.5 py-1.5 rounded text-[9px] btn-5d-primary text-white font-bold flex items-center gap-1 shadow-md">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 Edit
-                            </button>` : ''}
-                        </div>
+                            </button>
+                        </div>` : ''}
                     </div>
-                    ${performanceToolbarHTML}
 
-                    <!-- Live Roadmap and Family Chords (Outside of Hide Tools) -->
-                    <div class="mt-1.5 space-y-1.5">
+                    <!-- Live Roadmap and Family Chords -->
+                    <div class="mt-2 space-y-1.5">
                         <!-- Roadmap Header Panel -->
                         <div class="p-2 bg-indigo-900/20 rounded-lg border border-indigo-500/30 shadow-[inset_0_0_20px_rgba(99,102,241,0.05)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
@@ -2597,22 +3736,39 @@ window.renderSong = function() {
                     </div>
                 </div>
 
-                <div class="mt-2 pr-1 sm:pr-2 pb-6 song-scroll-container flex-1 overflow-y-auto">
-                ${activeRoadmap.map((block, idx) => {
-                    const templateLines = sectionTemplates[block.name] || [];
-                    const blockOffset = block.keyOffset || 0;
-                    const blockEffectiveSemitones = semitones + blockOffset;
-                    const blockKeyName = window.getModulatedKeyName(currentKey, blockOffset);
-                    const displayModulationBadge = blockOffset !== 0 ? `<span class="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded px-1.5 py-0.5 font-mono ml-2 uppercase whitespace-nowrap">Key: ${blockKeyName} (${blockOffset >= 0 ? '+' : ''}${blockOffset})</span>` : '';
+                <div id="lyricsFullscreenWrap" class="mt-2 flex flex-col flex-1 relative min-h-0 bg-transparent transition-all">
+                    <div class="flex justify-between items-center mb-1.5 pr-1 sm:pr-2">
+                        <span class="text-[9px] sm:text-[10px] text-indigo-400 uppercase tracking-widest font-extrabold select-none flex-shrink-0">Sheet View</span>
+                        
+                        <div class="flex items-center gap-1.5">
+                            <button id="controlsToggleBtn" onclick="window.toggleControlPanel()" class="px-2 py-1 bg-white/5 hover:bg-white/10 text-indigo-300 rounded flex items-center gap-1 text-[9px] font-bold transition-all border border-white/5 shadow-sm active:scale-95">
+                                ${controlsExpanded ? '<span>▲</span> Hide Tools' : '<span>▼</span> Show Tools'}
+                            </button>
+                            <button onclick="window.toggleLyricsFullscreen()" class="fs-hide-btn px-2 py-1 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-bold transition-all border border-white/5 shadow-sm active:scale-95" title="Fullscreen Lyrics">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                <span class="hidden sm:inline">Fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${performanceToolbarHTML}
+                    
+                    <div class="pr-1 sm:pr-2 pb-6 song-scroll-container flex-1 overflow-y-auto custom-scrollbar w-full ${controlsExpanded ? 'mt-0' : 'mt-1'}">
+                    ${activeRoadmap.map((block, idx) => {
+                        const templateLines = sectionTemplates[block.name] || [];
+                        const blockOffset = block.keyOffset || 0;
+                        const blockEffectiveSemitones = semitones + blockOffset;
+                        const blockKeyName = window.getModulatedKeyName(currentKey, blockOffset);
+                        const displayModulationBadge = blockOffset !== 0 ? `<span class="text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded px-1.5 py-0.5 font-mono ml-2 uppercase whitespace-nowrap">Key: ${blockKeyName} (${blockOffset >= 0 ? '+' : ''}${blockOffset})</span>` : '';
 
-                    let badgeColor = "bg-indigo-500/20 text-indigo-300 border-indigo-500/30";
-                    let nameLower = block.name.toLowerCase();
-                    if (nameLower.includes('chorus')) badgeColor = "bg-amber-500/20 text-amber-300 border-amber-500/30";
-                    else if (nameLower.includes('verse')) badgeColor = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
-                    else if (nameLower.includes('bridge')) badgeColor = "bg-purple-500/20 text-purple-300 border-purple-500/30";
-                    else if (nameLower.includes('intro') || nameLower.includes('outro')) badgeColor = "bg-sky-500/20 text-sky-300 border-sky-500/30";
+                        let badgeColor = "bg-indigo-500/20 text-indigo-300 border-indigo-500/30";
+                        let nameLower = block.name.toLowerCase();
+                        if (nameLower.includes('chorus')) badgeColor = "bg-amber-500/20 text-amber-300 border-amber-500/30";
+                        else if (nameLower.includes('verse')) badgeColor = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+                        else if (nameLower.includes('bridge')) badgeColor = "bg-purple-500/20 text-purple-300 border-purple-500/30";
+                        else if (nameLower.includes('intro') || nameLower.includes('outro')) badgeColor = "bg-sky-500/20 text-sky-300 border-sky-500/30";
 
-                    const isOpen = sectionOpenStates[idx] !== false; 
+                        const isOpen = sectionOpenStates[idx] !== false; 
 
                     return `
                     <div id="sec-wrapper-${idx}" class="group bg-indigo-900/20 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(99,102,241,0.05)] transition-all border border-indigo-500/30 mb-4">
@@ -2632,7 +3788,7 @@ window.renderSong = function() {
 
                                         const transposed = window.transposeChord(l.Chords || '', blockEffectiveSemitones);
                                         const numbers = window.getNumberForChord(transposed, blockKeyName);
-                                        const interactiveChords = window.makeChordsClickable(transposed);
+                                        const interactiveChords = window.makeChordsClickable(transposed, blockKeyName);
                                         
                                         return `
                                         <div class="line-block animate-fadeIn" onclick="window.toggleLineFocus(this)">
@@ -2681,12 +3837,18 @@ window.addEventListener('keydown', function(e) {
     } else if (e.key === '-') {
         window.adjustZoom(-0.1);
     } else if (e.key === 'f' || e.key === 'F') {
-        window.toggleFullScreen();
+        if (document.fullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen();
+        } else {
+            window.toggleFullScreen();
+        }
     } else if (e.key === 'Escape') {
         window.closeForm();
         window.closeAdminModal();
         window.closeShortcutsModal();
         window.hideChordTooltip();
+        window.closeFretboardHelp();
+        window.closeKeysHelp();
     }
 });
 
